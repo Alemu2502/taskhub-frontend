@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { adminAPI } from '../../../lib/api';
+import { adminAPI } from '../../../../lib/api';
 import toast from 'react-hot-toast';
 import { formatDistanceToNow } from 'date-fns';
 
