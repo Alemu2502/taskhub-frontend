@@ -92,6 +92,3 @@ export default function VerifyEmail() {
 }
 
 
-export async function generateStaticParams() {
-  return [];
-}
