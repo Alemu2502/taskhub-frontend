@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 import { FiMail, FiLock } from 'react-icons/fi';
 
 export default function ResetPassword() {
+  if (typeof window === 'undefined') return null;   // <--- Prevent build error
+
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [step, setStep] = useState(token ? 'reset' : 'request'); // request or reset
@@ -44,6 +46,7 @@ export default function ResetPassword() {
     setLoading(false);
   };
 
+
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -73,6 +76,7 @@ export default function ResetPassword() {
     }
     setLoading(false);
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">

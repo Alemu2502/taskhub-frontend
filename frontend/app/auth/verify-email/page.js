@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 export default function VerifyEmail() {
+  if (typeof window === 'undefined') return null;   // <--- Prevent build error
+
   const [status, setStatus] = useState('verifying'); // verifying, success, error
   const [message, setMessage] = useState('');
   const router = useRouter();
@@ -23,6 +25,7 @@ export default function VerifyEmail() {
       return;
     }
     verifyEmail();
+    // eslint-disable-next-line
   }, [token]);
 
   const verifyEmail = async () => {
@@ -64,7 +67,6 @@ export default function VerifyEmail() {
               <p className="text-gray-600 dark:text-gray-400">Please wait...</p>
             </>
           )}
-
           {status === 'success' && (
             <>
               <FiCheckCircle className="text-green-500 text-6xl mx-auto mb-4" />
@@ -73,7 +75,6 @@ export default function VerifyEmail() {
               <p className="text-sm text-gray-500 dark:text-gray-500">Redirecting to login...</p>
             </>
           )}
-
           {status === 'error' && (
             <>
               <FiXCircle className="text-red-500 text-6xl mx-auto mb-4" />
