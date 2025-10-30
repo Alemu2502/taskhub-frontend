@@ -1,6 +1,6 @@
 'use client';
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -9,11 +9,11 @@ import toast from 'react-hot-toast';
 import { FiMail, FiLock } from 'react-icons/fi';
 
 export default function ResetPassword() {
-  if (typeof window === 'undefined') return null;   // <--- Prevent build error
+  if (typeof window === 'undefined') return null;
 
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
-  const [step, setStep] = useState(token ? 'reset' : 'request'); // request or reset
+  const [step, setStep] = useState(token ? 'reset' : 'request');
   const [email, setEmail] = useState('');
   const [formData, setFormData] = useState({
     password: '',
@@ -46,7 +46,6 @@ export default function ResetPassword() {
     setLoading(false);
   };
 
-
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -77,7 +76,6 @@ export default function ResetPassword() {
     setLoading(false);
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
@@ -95,7 +93,6 @@ export default function ResetPassword() {
             }
           </p>
         </div>
-
         <div className="card">
           {step === 'request' ? (
             <form onSubmit={handleRequestReset} className="space-y-6">
@@ -169,4 +166,9 @@ export default function ResetPassword() {
       </div>
     </div>
   );
+}
+
+
+export async function generateStaticParams() {
+  return [];
 }

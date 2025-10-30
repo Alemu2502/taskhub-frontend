@@ -1,6 +1,6 @@
 'use client';
-export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -9,9 +9,9 @@ import toast from 'react-hot-toast';
 import { FiCheckCircle, FiXCircle } from 'react-icons/fi';
 
 export default function VerifyEmail() {
-  if (typeof window === 'undefined') return null;   // <--- Prevent build error
+  if (typeof window === 'undefined') return null;
 
-  const [status, setStatus] = useState('verifying'); // verifying, success, error
+  const [status, setStatus] = useState('verifying');
   const [message, setMessage] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -89,4 +89,9 @@ export default function VerifyEmail() {
       </div>
     </div>
   );
+}
+
+
+export async function generateStaticParams() {
+  return [];
 }
