@@ -168,7 +168,6 @@ export default function ResetPassword() {
   );
 }
 
-
 export async function generateStaticParams() {
   return [];
 }
