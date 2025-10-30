@@ -48,7 +48,7 @@ export default function Login() {
         console.log('✅ Login successful!');
         console.log('👤 User:', {
           id: user.id,
-          username: user.username,
+          // username: user.username,
           email: user.email,
           role: user.role,
         });
@@ -68,9 +68,9 @@ export default function Login() {
         if (storedToken) {
           console.log('🔍 Token preview:', storedToken.substring(0, 20) + '...');
         }
-        if (storedUser) {
-          console.log('🔍 Stored user:', JSON.parse(storedUser).username);
-        }
+        // if (storedUser) {
+        //   console.log('🔍 Stored user:', JSON.parse(storedUser).username);
+        // }
         
         toast.success('Login successful! Redirecting...');
         
@@ -122,7 +122,7 @@ export default function Login() {
             <div>
               <label className="label">
                 <FiMail className="inline mr-2" />
-                Email or Username
+                Email
               </label>
               <input
                 type="text"

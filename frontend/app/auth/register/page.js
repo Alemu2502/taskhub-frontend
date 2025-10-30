@@ -17,8 +17,8 @@ function RegisterForm() {
     country: '',
     customCountry: '',
     mobile: '',
-    //dateOfBirth: '',
-    agreedToTerms: false
+    agreedToTerms: false,
+    referralCode: ''  
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -33,6 +33,14 @@ function RegisterForm() {
   });
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
+
+  useEffect(() => {
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) setFormData(f => ({ ...f, referralCode: ref }));
+  }
+}, []);
 
   // Check password strength in real-time
   useEffect(() => {
@@ -125,7 +133,8 @@ function RegisterForm() {
   password: formData.password,
   country: finalCountry,
   mobile: formData.mobile,
-  recaptchaToken
+  recaptchaToken,
+  referralCode: formData.referralCode 
 });
 
       toast.success(response.data.message || 'Registration successful! Please check your email to verify your account.');
@@ -257,6 +266,20 @@ function RegisterForm() {
                 required
               />
             </div>
+           <div>
+  <label className="label">
+    Referral Code (optional)
+  </label>
+  <input
+    type="text"
+    name="referralCode"
+    value={formData.referralCode}
+    onChange={handleChange}
+    className="input-field"
+    placeholder="Referral code (if you have one)"
+    disabled={!!formData.referralCode} // auto-filled code can't be edited
+  />
+</div>
 
             <div>
               <label className="label">
