@@ -33,22 +33,12 @@ export default function Jobs() {
   const [search, setSearch] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
 
-  // Initial load/all-filters load jobs
-  useEffect(() => {
-    fetchJobs();
-    // eslint-disable-next-line
-  }, []);
-
-  // Filter platform & sort instantly when UI dropdowns change
-  useEffect(() => {
-    filterAndSortJobs();
-    // eslint-disable-next-line
-  }, [platform, sort, appliedSearch, allJobs]);
+  useEffect(() => { fetchJobs(); }, []);
+  useEffect(() => { filterAndSortJobs(); }, [platform, sort, appliedSearch, allJobs]);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      // Always get all jobs from backend for full local control
       const params = { limit: 200 };
       const response = await jobsAPI.getJobs(params);
       setAllJobs(response.data.data || []);
@@ -59,16 +49,11 @@ export default function Jobs() {
     }
   };
 
-  // Handles filtering and sorting locally and rapidly
   const filterAndSortJobs = () => {
     let filtered = allJobs;
-
-    // Platform
     if (platform !== 'all') {
       filtered = filtered.filter(job => (job.platform || '').toLowerCase() === platform);
     }
-
-    // Search
     if (appliedSearch) {
       const q = appliedSearch.trim().toLowerCase();
       filtered = filtered.filter(job =>
@@ -76,8 +61,6 @@ export default function Jobs() {
         (job.instructions && job.instructions.toLowerCase().includes(q))
       );
     }
-
-    // Sort
     if (sort === 'low-to-high') {
       filtered = [...filtered].sort((a, b) => a.reward - b.reward);
     } else if (sort === 'high-to-low') {
@@ -85,11 +68,9 @@ export default function Jobs() {
     } else {
       filtered = [...filtered].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-
     setJobs(filtered);
   };
 
-  // UI handlers
   const handlePlatformChange = (e) => setPlatform(e.target.value);
   const handleSortChange = (e) => setSort(e.target.value);
   const handleSearchInput = (e) => setSearch(e.target.value);
@@ -111,46 +92,54 @@ export default function Jobs() {
               Find jobs that match your interests and start earning
             </p>
           </div>
-          {/* Filters */}
+          {/* Single row, fully responsive filter bar */}
           <form 
             onSubmit={handleApplyFilters}
-            className="card mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col md:flex-row gap-4 md:gap-8 items-end"
+            className="flex flex-row flex-wrap items-end gap-4 bg-white dark:bg-gray-800 p-6 mb-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
           >
-            <div>
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Platform</label>
               <select
-                className="input-field"
+                className="input-field w-full"
                 value={platform}
                 onChange={handlePlatformChange}
               >
-                {PLATFORMS.map(p => (<option key={p.value} value={p.value}>{p.label}</option>))}
+                {PLATFORMS.map(p => (
+                  <option key={p.value} value={p.value}>{p.label}</option>
+                ))}
               </select>
             </div>
-            <div>
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Sort By</label>
               <select
-                className="input-field"
+                className="input-field w-full"
                 value={sort}
                 onChange={handleSortChange}
               >
-                {SORTS.map(s => (<option key={s.value} value={s.value}>{s.label}</option>))}
+                {SORTS.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[200px] w-full">
+            <div className="flex-1 min-w-[240px]">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Search</label>
               <input
                 type="text"
                 className="input-field w-full"
-                placeholder="Type to search title or keyword…"
+                placeholder="Type to search title or keyword..."
                 value={search}
                 onChange={handleSearchInput}
               />
             </div>
-            <button type="submit" className="btn-primary w-full md:w-auto mt-3 md:mt-0">
+            <button 
+              type="submit" 
+              className="h-12 w-full md:w-auto rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-5 md:mt-0"
+              style={{ whiteSpace: 'nowrap' }}
+            >
               Apply
             </button>
           </form>
-          {/* Jobs Grid */}
+          {/* Jobs grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (

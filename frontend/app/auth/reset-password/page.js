@@ -1,12 +1,9 @@
 'use client';
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { FiMail, FiLock } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function ResetPassword() {
   if (typeof window === 'undefined') return null;
@@ -19,6 +16,8 @@ export default function ResetPassword() {
     password: '',
     confirmPassword: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -58,7 +57,7 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/reset-password`, {
+      const res = await fetch(`${API}/api/auth/reset-password`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password: formData.password }),
@@ -104,7 +103,7 @@ export default function ResetPassword() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   className="input-field"
                   placeholder="Enter your email"
                   required
@@ -120,33 +119,45 @@ export default function ResetPassword() {
             </form>
           ) : (
             <form onSubmit={handleResetPassword} className="space-y-6">
-              <div>
+              <div className="relative">
                 <label className="label">
                   <FiLock className="inline mr-2" />
                   New Password
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="input-field"
+                  onChange={e => setFormData({ ...formData, password: e.target.value })}
+                  className="input-field pr-10"
                   placeholder="Enter new password"
                   required
                 />
+                <span
+                  className="absolute right-3 top-10 cursor-pointer"
+                  onClick={() => setShowPassword(show => !show)}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </span>
               </div>
-              <div>
+              <div className="relative">
                 <label className="label">
                   <FiLock className="inline mr-2" />
                   Confirm Password
                 </label>
                 <input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="input-field"
+                  onChange={e => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="input-field pr-10"
                   placeholder="Confirm new password"
                   required
                 />
+                <span
+                  className="absolute right-3 top-10 cursor-pointer"
+                  onClick={() => setShowConfirmPassword(show => !show)}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </span>
               </div>
               <button
                 type="submit"
@@ -167,4 +178,3 @@ export default function ResetPassword() {
     </div>
   );
 }
-
