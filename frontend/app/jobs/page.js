@@ -92,7 +92,6 @@ export default function Jobs() {
               Find jobs that match your interests and start earning
             </p>
           </div>
-          {/* Single row, fully responsive filter bar */}
           <form 
             onSubmit={handleApplyFilters}
             className="flex flex-row flex-wrap items-end gap-4 bg-white dark:bg-gray-800 p-6 mb-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
@@ -139,7 +138,6 @@ export default function Jobs() {
               Apply
             </button>
           </form>
-          {/* Jobs grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
