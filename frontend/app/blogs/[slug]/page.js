@@ -165,11 +165,3 @@ export default function BlogDetails() {
 }
 
 
-export async function generateStaticParams() {
-  // fetch or define all valid slugs here
-  const posts = await fetch('YOUR_API_OR_POST_SOURCE').then(res => res.json())
-
-  return posts.map(post => ({
-    slug: post.slug
-  }));
-}
