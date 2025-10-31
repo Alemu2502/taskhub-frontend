@@ -92,14 +92,15 @@ export default function Jobs() {
               Find jobs that match your interests and start earning
             </p>
           </div>
-          <form 
+          {/* --------- FIXED SEARCH/SORT/FILTER BAR --------- */}
+          <form
             onSubmit={handleApplyFilters}
-            className="bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-4"
+            className="bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-4 md:flex-row md:items-end md:gap-6"
           >
-            <div className="w-full">
+            <div className="w-full md:w-auto flex-1">
               <label className="block text-sm font-medium text-gray-900 mb-1">Platform</label>
               <select
-                className="input-field w-full"
+                className="input-field w-full md:w-auto"
                 value={platform}
                 onChange={handlePlatformChange}
               >
@@ -108,10 +109,10 @@ export default function Jobs() {
                 ))}
               </select>
             </div>
-            <div className="w-full">
+            <div className="w-full md:w-auto flex-1">
               <label className="block text-sm font-medium text-gray-900 mb-1">Sort By</label>
               <select
-                className="input-field w-full"
+                className="input-field w-full md:w-auto"
                 value={sort}
                 onChange={handleSortChange}
               >
@@ -120,26 +121,27 @@ export default function Jobs() {
                 ))}
               </select>
             </div>
-            <div className="w-full">
+            <div className="w-full md:w-auto flex-1">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Search</label>
               <input
                 type="text"
-                className="input-field w-full"
+                className="input-field w-full md:w-auto"
                 placeholder="Type to search title or keyword..."
                 value={search}
                 onChange={handleSearchInput}
               />
             </div>
-            <div className="w-full">
-              <button 
-                type="submit" 
-                className="h-12 w-full rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-2"
+            <div className="w-full md:w-auto">
+              <button
+                type="submit"
+                className="h-12 w-full md:w-auto rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-2 md:mt-0"
                 style={{ whiteSpace: 'nowrap' }}
               >
                 Apply
               </button>
             </div>
           </form>
+          {/* -------------------------------------------------- */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
