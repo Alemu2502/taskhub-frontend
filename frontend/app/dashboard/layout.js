@@ -5,21 +5,22 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { getAuth, clearAuth } from '../../lib/auth';
 import { authAPI } from '../../lib/api';
-import { 
-  FiMenu, 
-  FiX, 
-  FiHome, 
-  FiBriefcase, 
-  FiSettings, 
-  FiLogOut, 
-  FiSun, 
-  FiMoon, 
-  FiUsers, 
-  FiDollarSign, 
-  FiBarChart2, 
+import {
+  FiMenu,
+  FiX,
+  FiHome,
+  FiBriefcase,
+  FiSettings,
+  FiLogOut,
+  FiSun,
+  FiMoon,
+  FiUsers,
+  FiDollarSign,
+  FiBarChart2,
   FiFileText,
   FiCreditCard
 } from 'react-icons/fi';
+import NotificationBell from '../../components/notificationBell'; // <----- add this line
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -125,7 +126,6 @@ export default function DashboardLayout({ children }) {
                 </span>
               )}
             </div>
-
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
               <button
@@ -134,7 +134,6 @@ export default function DashboardLayout({ children }) {
               >
                 {darkMode ? <FiSun size={20} /> : <FiMoon size={20} />}
               </button>
-
               <div className="hidden sm:flex items-center gap-3 px-4 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
                 <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-semibold">
                   {user.username?.charAt(0).toUpperCase()}
@@ -158,8 +157,8 @@ export default function DashboardLayout({ children }) {
         <div className="h-full pt-20 pb-4 overflow-y-auto">
           <div className="px-3 space-y-1">
             {/* Home Link (at top, no margin) */}
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center gap-3 font-semibold text-lg px-4 py-3 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20"
               onClick={() => setSidebarOpen(false)}
             >
@@ -168,9 +167,33 @@ export default function DashboardLayout({ children }) {
             </Link>
 
             {/* Sidebar Navigation */}
-            {navigation.map((item) => {
+            {navigation.map((item, idx) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
+              // Insert NotificationBell right after Wallet
+              if (item.name === 'Wallet') {
+                return (
+                  <div key={item.name}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                        isActive
+                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <Icon size={20} />
+                      <span>{item.name}</span>
+                    </Link>
+                    {/* NotificationBell right after Wallet */}
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <NotificationBell userId={user._id} />
+                      <span className="text-gray-700 dark:text-gray-300">Notifications</span>
+                    </div>
+                  </div>
+                );
+              }
               return (
                 <Link
                   key={item.name}

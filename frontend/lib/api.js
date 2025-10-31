@@ -109,4 +109,26 @@ export const adminAPI = {
 
 };
 
+
+export async function getMyNotifications(userId) {
+  return fetch(`/api/notifications?userId=${userId}`).then(r => r.json());
+}
+
+export async function markNotificationRead(id, userId) {
+  return fetch(`/api/notifications/${id}/read`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ userId }),
+  });
+}
+
+export async function sendNotification({ userIds, message, link }) {
+  return fetch("/api/notifications", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ userIds, message, link }),
+  });
+}
+
+
 export default instance;
