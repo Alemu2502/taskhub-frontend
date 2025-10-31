@@ -110,29 +110,20 @@ export const adminAPI = {
 };
 
 
-export async function getMyNotifications(userId) {
-  return fetch(`/api/notifications?userId=${userId}`).then(r => r.json());
-}
-
-export async function markNotificationRead(id, userId) {
-  return fetch(`/api/notifications/${id}/read`, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ userId }),
-  });
-}
-
-export async function sendNotification({ userIds, message, link }) {
-  return fetch("/api/notifications", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ userIds, message, link }),
-  });
-}
-
-
 export async function getAllUsers() {
-  return fetch('/api/user').then(res => res.json());
+  return instance.get('/api/user').then(res => res.data);
+}
+
+
+
+export async function getMyNotifications(userId) {
+  return instance.get('/api/notifications', { params: { userId } }).then(r => r.data);
+}
+export async function markNotificationRead(id, userId) {
+  return instance.post(`/api/notifications/${id}/read`, { userId });
+}
+export async function sendNotification({ userIds, message, link }) {
+  return instance.post('/api/notifications', { userIds, message, link });
 }
 
 
