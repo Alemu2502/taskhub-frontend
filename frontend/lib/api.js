@@ -131,4 +131,9 @@ export async function sendNotification({ userIds, message, link }) {
 }
 
 
+export async function getAllUsers() {
+  return fetch('/api/users').then(res => res.json());
+}
+
+
 export default instance;
