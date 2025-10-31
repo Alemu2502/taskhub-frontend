@@ -89,7 +89,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Manage Jobs', href: '/dashboard/manage-jobs', icon: FiBriefcase },
     { name: 'Submissions', href: '/dashboard/submissions', icon: FiFileText },
     { name: 'Withdrawals', href: '/dashboard/withdrawals', icon: FiDollarSign },
-    { name: 'Send Notifications', href: '/admin/notifications', icon: FiBell },
+    { name: 'Send Notifications', href: '/api/notifications', icon: FiBell },
   ];
 
   const navigation = user?.role === 'admin' ? adminNavigation : userNavigation;
