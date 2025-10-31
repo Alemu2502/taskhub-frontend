@@ -57,6 +57,17 @@ export default function DashboardLayout({ children }) {
     }
   }, [router, pathname]);
 
+
+  useEffect(() => {
+  function handleSidebarCloseEvent() {
+    setSidebarOpen(false);
+  }
+  window.addEventListener("sidebar:close", handleSidebarCloseEvent);
+  return () => {
+    window.removeEventListener("sidebar:close", handleSidebarCloseEvent);
+  };
+}, []);
+
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);

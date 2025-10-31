@@ -116,7 +116,12 @@ export default function NotificationBell() {
 
   return (
     <button
-      onClick={() => router.push("/dashboard/notifications")}
+        onClick={() => {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("sidebar:close"));
+    }
+    router.push("/dashboard/notifications");
+  }}
       className={`
         flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
         text-gray-700 dark:text-gray-300
