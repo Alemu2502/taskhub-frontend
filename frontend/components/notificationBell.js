@@ -1,48 +1,62 @@
-import { useState, useEffect } from "react";
-import { getMyNotifications } from "../lib/api";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getMyNotifications } from "../lib/api";
+import { FiBell } from "react-icons/fi";
+import jwt_decode from "jwt-decode";
 
-export default function NotificationBell({ userId }) {
-  const [unread, setUnread] = useState(0);
+// Utility to get userId from JWT cookie
+function getUserIdFromCookie() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/token=([^;]+)/);
+  if (!match) return null;
+  try {
+    const decoded = jwt_decode(match[1]);
+    return decoded.userId || decoded.id || decoded._id;
+  } catch {
+    return null;
+  }
+}
+
+export default function NotificationBell() {
   const router = useRouter();
+  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
+    const userId = getUserIdFromCookie();
     if (userId) {
-      getMyNotifications(userId).then(notifications => {
-        setUnread(notifications.filter(n => !n.readBy.includes(userId)).length);
+      getMyNotifications(userId).then((notifications) => {
+        setUnread(
+          notifications.filter((n) => !n.readBy?.includes(userId)).length
+        );
       });
     }
-  }, [userId]);
+  }, []);
 
   return (
-    <div
+    <button
       onClick={() => router.push("/notifications")}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        position: "relative"
-      }}
-      aria-label="View notifications"
-      tabIndex={0} 
-      role="button"
+      className={`
+        flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+        text-gray-700 dark:text-gray-300
+        hover:bg-gray-100 dark:hover:bg-gray-700
+        font-medium w-full relative
+      `}
     >
-      <span style={{ fontSize: "22px" }}>🔔</span>
-      {unread > 0 && (
-        <span style={{
-          position: 'absolute', top: 0, right: 0,
-          background: 'red', color: 'white',
-          borderRadius: '50%', padding: '0 7px', fontSize: '14px'
-        }}>
-          {unread}
-        </span>
-      )}
-      <span style={{ fontWeight: 500, color: "#232323", fontSize: "15px" }}>
-        Notification
+      <span className="relative">
+        <FiBell size={20} />
+        {unread > 0 && (
+          <span
+            className={`
+              absolute -top-2 -right-2 min-w-[20px] h-[20px] rounded-full 
+              bg-red-500 text-white text-xs font-bold flex items-center justify-center
+              px-1.5`
+            }
+          >
+            {unread}
+          </span>
+        )}
       </span>
-    </div>
+      <span>Notification</span>
+    </button>
   );
 }

@@ -172,7 +172,7 @@ export default function DashboardLayout({ children }) {
             {navigation.map((item, idx) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-              // Insert NotificationBell right after Wallet
+            
               if (item.name === 'Wallet') {
                 return (
                   <div key={item.name}>
@@ -190,8 +190,7 @@ export default function DashboardLayout({ children }) {
                     </Link>
                     {/* NotificationBell right after Wallet */}
                     <div className="flex items-center gap-3 px-4 py-3">
-                      <NotificationBell userId={user._id} />
-                      <span className="text-gray-700 dark:text-gray-300">Notifications</span>
+                      <NotificationBell />
                     </div>
                   </div>
                 );
