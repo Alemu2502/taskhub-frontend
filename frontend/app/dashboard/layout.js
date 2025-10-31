@@ -18,7 +18,8 @@ import {
   FiDollarSign,
   FiBarChart2,
   FiFileText,
-  FiCreditCard
+  FiCreditCard,
+  FiBell
 } from 'react-icons/fi';
 import NotificationBell from '../../components/notificationBell'; // <----- add this line
 
