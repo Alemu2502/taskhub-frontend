@@ -159,9 +159,9 @@ export default function JobDetails() {
             <div>
               <div className="font-bold text-primary-600 text-[12px]">Job ID:</div>
               <div className="text-xs text-gray-700">{job._id}</div>
-              {job.createdBy?.username && (
+              {job.createdBy?.fullname && (
                 <div className="text-xs text-gray-500 mt-1">
-                  posted by <span className="font-semibold">{job.createdBy.username}</span>
+                  posted by <span className="font-semibold">{job.createdBy.fullname}</span>
                 </div>
               )}
             </div>
