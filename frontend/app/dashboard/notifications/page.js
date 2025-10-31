@@ -146,7 +146,7 @@
 
 "use client";
 import { useEffect, useState } from "react";
-import { getMyNotifications, markNotificationRead } from "../../lib/api";
+import { getMyNotifications, markNotificationRead } from "../../../lib/api";
 import Link from "next/link";
 
 export default function NotificationsPage() {
@@ -157,6 +157,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState("");
   const [hovered, setHovered] = useState(null);
 
+  // User fetch and debug
   useEffect(() => {
     try {
       const userStr = localStorage.getItem("user");
@@ -164,11 +165,8 @@ export default function NotificationsPage() {
         const user = JSON.parse(userStr);
         setUserObj(user);
         const finalId = user._id || user.id;
-        if (finalId) {
-          setUserId(finalId);
-        } else {
-          setError("User found, but id key missing.");
-        }
+        setUserId(finalId || null);
+        if (!finalId) setError("User found, but id key missing.");
       } else {
         setError("Not logged in — no user in localStorage.");
       }
@@ -179,6 +177,13 @@ export default function NotificationsPage() {
   }, []);
 
   useEffect(() => {
+    // Debugging info
+    console.log("DEBUG --- userObj:", userObj);
+    console.log("DEBUG --- userId:", userId);
+    console.log("DEBUG --- raw localStorage user:", localStorage.getItem("user"));
+  }, [userObj, userId]);
+
+  useEffect(() => {
     if (!userId) return;
     setLoading(true);
     setError("");
@@ -186,11 +191,12 @@ export default function NotificationsPage() {
       .then((data) => {
         setNotifications(data || []);
         setLoading(false);
-        // console.log("Fetched notifications:", data);
+        console.log("DEBUG --- Fetched notifications:", data);
       })
       .catch((err) => {
         setError("Could not fetch notifications.");
         setLoading(false);
+        console.error("DEBUG --- getMyNotifications error:", err);
       });
   }, [userId]);
 
@@ -204,6 +210,7 @@ export default function NotificationsPage() {
       );
     } catch (e) {
       alert("Failed to mark as read!");
+      console.error("DEBUG --- markNotificationRead error:", e);
     }
   };
 
