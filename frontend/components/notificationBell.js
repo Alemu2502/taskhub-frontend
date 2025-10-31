@@ -1,8 +1,6 @@
-// NotificationBell.js
 import { useState, useEffect } from "react";
-import { getMyNotifications, markNotificationRead } from "../lib/api";
+import { getMyNotifications } from "../lib/api";
 import { useRouter } from "next/navigation";
-
 
 export default function NotificationBell({ userId }) {
   const [unread, setUnread] = useState(0);
@@ -17,12 +15,22 @@ export default function NotificationBell({ userId }) {
   }, [userId]);
 
   return (
-    <button
-      onClick={() => router.push("/notifications")} 
-      style={{ position: 'relative', background: "none", border: "none" }}
+    <div
+      onClick={() => router.push("/notifications")}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        position: "relative"
+      }}
       aria-label="View notifications"
+      tabIndex={0} 
+      role="button"
     >
-      🔔
+      <span style={{ fontSize: "22px" }}>🔔</span>
       {unread > 0 && (
         <span style={{
           position: 'absolute', top: 0, right: 0,
@@ -32,6 +40,9 @@ export default function NotificationBell({ userId }) {
           {unread}
         </span>
       )}
-    </button>
+      <span style={{ fontWeight: 500, color: "#232323", fontSize: "15px" }}>
+        Notification
+      </span>
+    </div>
   );
 }
