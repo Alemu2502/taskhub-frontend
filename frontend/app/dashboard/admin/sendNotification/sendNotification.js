@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { sendNotification } from "../../../../lib/api";
 
-// Toast UI - inline version, no config needed
 function Toast({ message, type = "success", onClose }) {
   if (!message) return null;
   return (
@@ -29,7 +28,7 @@ function Toast({ message, type = "success", onClose }) {
 
 export default function SendNotification({ users = [] }) {
   const [message, setMessage] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState(["all"]); // default is All Users
+  const [selectedUser, setSelectedUser] = useState("all"); // "all" is default
   const [sending, setSending] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "success" });
 
@@ -38,11 +37,11 @@ export default function SendNotification({ users = [] }) {
   const handleSend = async () => {
     setSending(true);
     try {
-      const userIds = selectedUsers.includes("all") ? ["all"] : selectedUsers;
+      const userIds = selectedUser === "all" ? ["all"] : [selectedUser];
       await sendNotification({ userIds, message, link: "" });
       setToast({ message: "Notification sent successfully!", type: "success" });
       setMessage("");
-      setSelectedUsers(["all"]);
+      setSelectedUser("all");
     } catch {
       setToast({ message: "Failed to send notification.", type: "error" });
     }
@@ -53,7 +52,7 @@ export default function SendNotification({ users = [] }) {
   return (
     <>
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: "" })} />
-      <div className="border max-w-2xl mx-auto text-gray-800 text-bold  bg-white p-8 rounded-2xl shadow mt-10 mb-10">
+      <div className="p-6 bg-white border rounded">
         <label className="block mb-2 font-bold">Notification Message</label>
         <textarea
           className="w-full border mb-2 p-2"
@@ -63,16 +62,9 @@ export default function SendNotification({ users = [] }) {
         />
         <label className="block mb-2 font-bold">Send To</label>
         <select
-          multiple
           className="w-full border mb-2 p-2"
-          value={selectedUsers}
-          onChange={e => {
-            const values = Array.from(e.target.selectedOptions, o => o.value);
-            // If All Users selected, ignore others
-            if (values.includes("all")) setSelectedUsers(["all"]);
-            else setSelectedUsers(values);
-          }}
-          size={Math.min(userOptions.length, 10)}
+          value={selectedUser}
+          onChange={e => setSelectedUser(e.target.value)}
         >
           {userOptions.map(u => (
             <option key={u._id} value={u._id}>
@@ -81,8 +73,7 @@ export default function SendNotification({ users = [] }) {
           ))}
         </select>
         <div className="text-xs mb-2">
-          By default "All Users" is selected.<br />
-          To send to some, deselect "All Users" and pick others.
+          Pick “All Users” to notify everyone, or a single user to target just one.
         </div>
         <button
           className="bg-blue-600 text-white px-4 py-2 rounded"
