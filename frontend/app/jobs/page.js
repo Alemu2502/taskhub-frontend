@@ -92,56 +92,48 @@ export default function Jobs() {
               Find jobs that match your interests and start earning
             </p>
           </div>
-          {/* --------- FIXED SEARCH/SORT/FILTER BAR --------- */}
-          <form
+          {/* Fully Responsive Filter Bar */}
+          <form 
             onSubmit={handleApplyFilters}
-            className="bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-4 md:flex-row md:items-end md:gap-6"
+            className="flex flex-row flex-wrap items-end gap-4 bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200"
           >
-            <div className="w-full md:w-auto flex-1">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-900 mb-1">Platform</label>
               <select
-                className="input-field w-full md:w-auto"
+                className="input-field w-full"
                 value={platform}
                 onChange={handlePlatformChange}
               >
-                {PLATFORMS.map(p => (
-                  <option key={p.value} value={p.value}>{p.label}</option>
-                ))}
+                {PLATFORMS.map(p => (<option key={p.value} value={p.value}>{p.label}</option>))}
               </select>
             </div>
-            <div className="w-full md:w-auto flex-1">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-sm font-medium text-gray-900 mb-1">Sort By</label>
               <select
-                className="input-field w-full md:w-auto"
+                className="input-field w-full"
                 value={sort}
                 onChange={handleSortChange}
               >
-                {SORTS.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
+                {SORTS.map(s => (<option key={s.value} value={s.value}>{s.label}</option>))}
               </select>
             </div>
-            <div className="w-full md:w-auto flex-1">
-              <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Search</label>
+            <div className="flex-1 min-w-[240px]">
+              <label className="block text-sm font-medium text-gray-900 mb-1">Search</label>
               <input
                 type="text"
-                className="input-field w-full md:w-auto"
+                className="input-field w-full"
                 placeholder="Type to search title or keyword..."
                 value={search}
                 onChange={handleSearchInput}
               />
             </div>
-            <div className="w-full md:w-auto">
-              <button
-                type="submit"
-                className="h-12 w-full md:w-auto rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-2 md:mt-0"
-                style={{ whiteSpace: 'nowrap' }}
-              >
-                Apply
-              </button>
-            </div>
+            <button 
+              type="submit" 
+              className="h-12 w-full md:w-auto rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-5 md:mt-0"
+              style={{ whiteSpace: 'nowrap' }}
+            >Apply</button>
           </form>
-          {/* -------------------------------------------------- */}
+          {/* Jobs grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
