@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import SendNotification from "./sendNotification";
-import { getAllUsers } from "../../lib/api";
+import { getAllUsers } from "../../../lib/api";
 
 export default function AdminNotificationPage() {
   const [users, setUsers] = useState([]);
