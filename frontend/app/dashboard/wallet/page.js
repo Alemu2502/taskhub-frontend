@@ -17,7 +17,7 @@ export default function WalletPage() {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawData, setWithdrawData] = useState({
     amount: '',
-    method: 'bep20',
+    method: 'telebirr',
     address: ''
   });
   const [pageSize, setPageSize] = useState(5);
@@ -65,7 +65,6 @@ export default function WalletPage() {
       return /^\+2519\d{8}$/.test(address.trim());
     }
     if (method === 'cbe') {
-      // Must be 13 digits and start with 1000
       return /^1000\d{9}$/.test(address.trim());
     }
     if (method === 'bep20') {
@@ -88,6 +87,11 @@ export default function WalletPage() {
       return;
     }
 
+    if (withdrawData.method === 'bep20') {
+      toast.error('Sorry, BEP20 withdrawals are temporarily unavailable. Please use Telebirr or CBE.');
+      return;
+    }
+
     if (!validateAddress()) {
       if (withdrawData.method === 'telebirr') {
         toast.error('Telebirr number must be in the format +2519XXXXXXXX');
@@ -101,18 +105,21 @@ export default function WalletPage() {
       return;
     }
 
+    toast.loading('Processing withdrawal...');
     try {
       await userAPI.requestWithdrawal({
         amount: withdrawData.amount,
         method: withdrawData.method,
         accountDetails: withdrawData.address
       });
+      toast.dismiss();
       toast.success('Withdrawal request submitted successfully');
       setShowWithdrawModal(false);
-      setWithdrawData({ amount: '', method: 'bep20', address: '' });
+      setWithdrawData({ amount: '', method: 'telebirr', address: '' });
       fetchWallet();
       fetchWithdrawals();
     } catch (error) {
+      toast.dismiss();
       toast.error(error.response?.data?.message || 'Failed to submit withdrawal request');
     }
   };
@@ -190,39 +197,54 @@ export default function WalletPage() {
                     className="input-field"
                     required
                   >
-                    <option value="bep20">BEP20 (USDT)</option>
+                    <option value="bep20" disabled>BEP20 (USDT) – Unavailable</option>
                     <option value="telebirr">Telebirr</option>
                     <option value="cbe">CBE Bank</option>
                   </select>
                 </div>
-                <div>
-                  <label className="label text-blue-700">
-                    {withdrawData.method === 'bep20' ? 'Wallet Address' :
-                     withdrawData.method === 'telebirr' ? 'Telebirr Number' :
-                     'Bank Account Number'}
-                  </label>
-                  <input
-                    type="text"
-                    value={withdrawData.address}
-                    onChange={(e) => setWithdrawData({ ...withdrawData, address: e.target.value })}
-                    className="input-field"
-                    required
-                    placeholder={
-                      withdrawData.method === 'bep20' ? '0x...' :
-                      withdrawData.method === 'telebirr' ? '+2519...' :
-                      '1000...'
-                    }
-                  />
-                  {withdrawData.method === 'telebirr' && withdrawData.address && !/^\+2519\d{8}$/.test(withdrawData.address) && (
-                    <div className="text-xs text-red-600 mt-1">Format must be +2519XXXXXXXX</div>
-                  )}
-                  {withdrawData.method === 'cbe' && withdrawData.address && !/^1000\d{9}$/.test(withdrawData.address) && (
-                    <div className="text-xs text-red-600 mt-1">CBE must start with 1000 and be 13 digits</div>
-                  )}
-                  {withdrawData.method === 'bep20' && withdrawData.address && !/^0x[a-fA-F0-9]{40}$/.test(withdrawData.address) && (
-                    <div className="text-xs text-red-600 mt-1">Must be valid BEP20 address (starts 0x, 42 chars)</div>
-                  )}
-                </div>
+                {withdrawData.method === 'bep20' && (
+                  <div className="p-3 mb-2 rounded bg-yellow-50 border border-yellow-300 text-yellow-800 font-medium text-sm flex items-center gap-2">
+                    <svg className="inline-block mr-2" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="10" fill="#FDE68A"/>
+                      <path d="M10 5V11" stroke="#D97706" strokeWidth="2" strokeLinecap="round"/>
+                      <circle cx="10" cy="14" r="1" fill="#D97706"/>
+                    </svg>
+                    Sorry, temporary withdrawal via BEP20 is unavailable. 
+                    <span className="font-semibold ml-1">Please choose Telebirr or CBE Bank.</span>
+                    <br />
+                    <span className="block text-xs text-yellow-700 mt-1">
+                      <b>Important:</b> Name on Telebirr or CBE must match your TaskHub account name exactly to avoid payout delay.
+                    </span>
+                  </div>
+                )}
+                {withdrawData.method !== 'bep20' && (
+                  <div>
+                    <label className="label text-blue-700">
+                      {withdrawData.method === 'telebirr' ? 'Telebirr Number' : 'Bank Account Number'}
+                    </label>
+                    <input
+                      type="text"
+                      value={withdrawData.address}
+                      onChange={(e) => setWithdrawData({ ...withdrawData, address: e.target.value })}
+                      className="input-field"
+                      required
+                      placeholder={
+                        withdrawData.method === 'telebirr' ? '+2519...' : '1000...'
+                      }
+                    />
+                    {withdrawData.method === 'telebirr' && withdrawData.address && !/^\+2519\d{8}$/.test(withdrawData.address) && (
+                      <div className="text-xs text-red-600 mt-1">Format must be +2519XXXXXXXX</div>
+                    )}
+                    {withdrawData.method === 'cbe' && withdrawData.address && !/^1000\d{9}$/.test(withdrawData.address) && (
+                      <div className="text-xs text-red-600 mt-1">CBE must start with 1000 and be 13 digits</div>
+                    )}
+                  </div>
+                )}
+                {withdrawData.method !== 'bep20' && (
+                  <div className="text-xs text-yellow-800 bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
+                    <b>Reminder:</b> Name on your Telebirr or CBE account must exactly match your TaskHub account name to prevent payout delays.
+                  </div>
+                )}
                 <div className="flex gap-3">
                   <button type="submit" className="btn-primary flex-1">
                     Submit Request

@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }) {
                   {user.username?.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-900 dark:text-white">{user.username}</p>
+                  <p className="font-medium text-gray-900 dark:text-white">{user.fullName}</p>
                   <p className="text-gray-500 dark:text-gray-400 text-xs">{user.email}</p>
                 </div>
               </div>
