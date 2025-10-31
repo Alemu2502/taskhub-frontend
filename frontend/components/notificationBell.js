@@ -21,15 +21,24 @@ export default function NotificationBell() {
   const router = useRouter();
   const [unread, setUnread] = useState(0);
 
+  // Fetch unread notifications AND auto-refresh
   useEffect(() => {
+    let intervalId;
     const userId = getUserIdFromCookie();
-    if (userId) {
-      getMyNotifications(userId).then((notifications) => {
+
+    async function fetchAndCount() {
+      if (userId) {
+        const notifications = await getMyNotifications(userId);
         setUnread(
           notifications.filter((n) => !n.readBy?.includes(userId)).length
         );
-      });
+      }
     }
+
+    fetchAndCount();
+    intervalId = setInterval(fetchAndCount, 10000); // 10 seconds
+
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -49,8 +58,9 @@ export default function NotificationBell() {
             className={`
               absolute -top-2 -right-2 min-w-[20px] h-[20px] rounded-full 
               bg-red-500 text-white text-xs font-bold flex items-center justify-center
-              px-1.5`
-            }
+              px-1.5
+              animate-pulse
+            `}
           >
             {unread}
           </span>
