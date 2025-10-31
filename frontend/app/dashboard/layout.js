@@ -189,9 +189,8 @@ export default function DashboardLayout({ children }) {
                       <span>{item.name}</span>
                     </Link>
                     {/* NotificationBell right after Wallet */}
-                    <div className="flex items-center gap-3 px-4 py-3">
                       <NotificationBell />
-                    </div>
+                   
                   </div>
                 );
               }

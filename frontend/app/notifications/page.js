@@ -11,17 +11,19 @@ export default function NotificationsPage() {
   const [error, setError] = useState("");
   const [hovered, setHovered] = useState(null);
 
-  // User extraction with debug
+  // Grab user, debug, support both id/_id keys
   useEffect(() => {
     try {
       const userStr = localStorage.getItem("user");
       if (userStr) {
         const user = JSON.parse(userStr);
         setUserObj(user);
-        if (user && user._id) {
-          setUserId(user._id);
+        // Support both id and _id, prefer _id if present.
+        const finalId = user._id || user.id;
+        if (finalId) {
+          setUserId(finalId);
         } else {
-          setError("User object found, but _id missing.");
+          setError("User found, but id key missing.");
         }
       } else {
         setError("Not logged in — no user in localStorage.");
@@ -32,10 +34,10 @@ export default function NotificationsPage() {
     setLoading(false);
   }, []);
 
-  // Debug output in dev tools
+  // Debug to verify actual object structure
   useEffect(() => {
-    console.log("🔍 NOTIFICATION PAGE DEBUG");
-    console.log("User raw from localStorage:", localStorage.getItem("user"));
+    console.log("🔍 Notification Page Debug");
+    console.log("Raw localStorage user:", localStorage.getItem("user"));
     console.log("userObj:", userObj);
     console.log("userId:", userId);
   }, [userObj, userId]);
@@ -94,7 +96,6 @@ export default function NotificationsPage() {
             ) : error ? (
               <div className="bg-white border border-red-400 rounded-xl py-8 px-6 text-red-600 dark:text-red-400 text-center shadow">
                 <b>{error}</b>
-                {/* Full localStorage debug */}
                 <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 break-all">
                   user: {localStorage.getItem("user")}
                 </div>
