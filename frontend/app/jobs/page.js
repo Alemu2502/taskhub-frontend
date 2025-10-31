@@ -23,6 +23,8 @@ const SORTS = [
   { value: 'high-to-low', label: 'Price: High to Low' },
 ];
 
+const PAGE_SIZE = 2; 
+
 export default function Jobs() {
   const [allJobs, setAllJobs] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -33,8 +35,11 @@ export default function Jobs() {
   const [search, setSearch] = useState('');
   const [appliedSearch, setAppliedSearch] = useState('');
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   useEffect(() => { fetchJobs(); }, []);
   useEffect(() => { filterAndSortJobs(); }, [platform, sort, appliedSearch, allJobs]);
+  useEffect(() => { setCurrentPage(1); }, [platform, sort, appliedSearch]);
 
   const fetchJobs = async () => {
     setLoading(true);
@@ -78,6 +83,10 @@ export default function Jobs() {
     e.preventDefault();
     setAppliedSearch(search);
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(jobs.length / PAGE_SIZE);
+  const paginatedJobs = jobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <>
@@ -136,7 +145,7 @@ export default function Jobs() {
           {/* Jobs grid */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
+              {[...Array(PAGE_SIZE)].map((_, i) => (
                 <div key={i} className="card animate-pulse">
                   <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
                   <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
@@ -145,12 +154,36 @@ export default function Jobs() {
                 </div>
               ))}
             </div>
-          ) : jobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {jobs.map((job) => (
-                <JobCard key={job._id} job={job} />
-              ))}
-            </div>
+          ) : paginatedJobs.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {paginatedJobs.map((job) => (
+                  <JobCard key={job._id} job={job} />
+                ))}
+              </div>
+              {/* Pagination controls */}
+              <div className="flex justify-center items-center gap-2 mt-8">
+                <button
+                  className="px-3 py-1 rounded border bg-gray-200 text-gray-700 disabled:opacity-50"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  type="button"
+                >
+                  Prev
+                </button>
+                <span className="mx-2 text-sm">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  className="px-3 py-1 rounded border bg-gray-200 text-gray-700 disabled:opacity-50"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  type="button"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-gray-600 dark:text-gray-400 text-lg">
