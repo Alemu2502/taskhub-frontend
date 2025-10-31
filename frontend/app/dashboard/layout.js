@@ -240,7 +240,6 @@
 //     </div>
 //   );
 // }
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -259,7 +258,6 @@ export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState(null);
-  const [showNotifications, setShowNotifications] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -311,6 +309,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: FiHome },
     { name: 'Browse Jobs', href: '/dashboard/jobs', icon: FiBriefcase },
     { name: 'Wallet', href: '/dashboard/wallet', icon: FiCreditCard },
+    { name: 'Notifications', href: '/dashboard/notifications', icon: FiBell },
     { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
   ];
 
@@ -378,58 +377,17 @@ export default function DashboardLayout({ children }) {
         </div>
       </header>
 
-      {/* Sidebar: hides on mobile when notifications open */}
+      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
-          ${showNotifications ? 'hidden sm:block' : ''}
           lg:translate-x-0`}
       >
         <div className="h-full pt-20 pb-4 overflow-y-auto">
           <div className="px-3 space-y-1">
-            <Link
-              href="/"
-              className="flex items-center gap-3 font-semibold text-lg px-4 py-3 rounded-lg text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <FiHome size={20} />
-              <span>Home</span>
-            </Link>
-
-            {navigation.map((item, idx) => {
+            {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-
-              if (item.name === 'Wallet') {
-                return (
-                  <div key={item.name}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <Icon size={20} />
-                      <span>{item.name}</span>
-                    </Link>
-                    {/* NotificationBell button */}
-                    <button
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full font-medium relative ${
-                        showNotifications
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                      style={{ outline: 'none', border: 'none', background: 'none' }}
-                      onClick={() => setShowNotifications((v) => !v)}
-                    >
-                      <NotificationBell />
-                    </button>
-                  </div>
-                );
-              }
               return (
                 <Link
                   key={item.name}
@@ -443,10 +401,10 @@ export default function DashboardLayout({ children }) {
                 >
                   <Icon size={20} />
                   <span>{item.name}</span>
+                  {item.name === 'Notifications' && <NotificationBell />}
                 </Link>
               );
             })}
-
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 font-semibold mt-4"
@@ -457,21 +415,20 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
       </aside>
-
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
-
       <main className="lg:pl-64 pt-16 flex gap-4 w-full">
-        <div className={`flex-1 ${showNotifications ? "hidden sm:block" : ""}`}>
-          {!showNotifications && children}
-        </div>
-        {showNotifications && (
+        {pathname === '/dashboard/notifications' ? (
           <div className="flex-1 w-full max-w-xl mx-auto sm:mx-0 mt-8">
-            <NotificationsPanel onClose={() => setShowNotifications(false)} />
+            <NotificationsPanel />
+          </div>
+        ) : (
+          <div className="flex-1">
+            {children}
           </div>
         )}
       </main>

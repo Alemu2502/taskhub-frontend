@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getMyNotifications, markNotificationRead } from '../lib/api';
 
-export default function NotificationsPanel({ onClose }) {
+export default function NotificationsPanel() {
   const [userId, setUserId] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,18 +55,10 @@ export default function NotificationsPanel({ onClose }) {
       className="w-full max-w-xl mx-auto sm:mx-0 bg-white dark:bg-gray-800 rounded-xl shadow p-6"
       style={{ minWidth: 300 }}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h2 className="text-xl font-bold text-primary-600 dark:text-primary-400">
           Notifications
         </h2>
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="bg-gray-200 dark:bg-gray-700 rounded px-3 py-1 text-xs font-semibold"
-          >
-            Close
-          </button>
-        )}
       </div>
       <div className="space-y-4">
         {loading ? (
