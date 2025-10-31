@@ -5,26 +5,40 @@ import Link from "next/link";
 
 export default function NotificationsPage() {
   const [userId, setUserId] = useState(null);
+  const [userObj, setUserObj] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hovered, setHovered] = useState(null);
 
+  // User extraction with debug
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem("user");
-      const user = storedUser ? JSON.parse(storedUser) : null;
-      if (!user || !user._id) {
-        setError("Not logged in.");
-        setLoading(false);
-        return;
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setUserObj(user);
+        if (user && user._id) {
+          setUserId(user._id);
+        } else {
+          setError("User object found, but _id missing.");
+        }
+      } else {
+        setError("Not logged in — no user in localStorage.");
       }
-      setUserId(user._id);
-    } catch (err) {
-      setError("Not logged in.");
-      setLoading(false);
+    } catch (e) {
+      setError("Could not parse user from localStorage.");
     }
+    setLoading(false);
   }, []);
+
+  // Debug output in dev tools
+  useEffect(() => {
+    console.log("🔍 NOTIFICATION PAGE DEBUG");
+    console.log("User raw from localStorage:", localStorage.getItem("user"));
+    console.log("userObj:", userObj);
+    console.log("userId:", userId);
+  }, [userObj, userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -34,20 +48,27 @@ export default function NotificationsPage() {
       .then((data) => {
         setNotifications(data || []);
         setLoading(false);
+        console.log("Fetched notifications:", data);
       })
-      .catch(() => {
+      .catch((err) => {
         setError("Could not fetch notifications.");
         setLoading(false);
+        console.error("Notification API error:", err);
       });
   }, [userId]);
 
   const handleMarkRead = async (id) => {
-    await markNotificationRead(id, userId);
-    setNotifications((prev) =>
-      prev.map((n) =>
-        n._id === id ? { ...n, readBy: [...(n.readBy || []), userId] } : n
-      )
-    );
+    try {
+      await markNotificationRead(id, userId);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n._id === id ? { ...n, readBy: [...(n.readBy || []), userId] } : n
+        )
+      );
+    } catch (e) {
+      alert("Failed to mark as read!");
+      console.error(e);
+    }
   };
 
   return (
@@ -71,7 +92,13 @@ export default function NotificationsPage() {
                 Loading notifications...
               </div>
             ) : error ? (
-              <div className="text-red-600 dark:text-red-400 text-center py-8">{error}</div>
+              <div className="bg-white border border-red-400 rounded-xl py-8 px-6 text-red-600 dark:text-red-400 text-center shadow">
+                <b>{error}</b>
+                {/* Full localStorage debug */}
+                <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 break-all">
+                  user: {localStorage.getItem("user")}
+                </div>
+              </div>
             ) : notifications.length === 0 ? (
               <div className="text-gray-600 dark:text-gray-300 text-center py-8">
                 No notifications yet.
