@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import SendNotification from "../sendNotification";
+import SendNotification from "./sendNotification";
 import { getAllUsers } from "../../../../lib/api";
 
 export default function AdminNotificationPage() {

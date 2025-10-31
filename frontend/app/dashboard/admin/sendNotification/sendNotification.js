@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { sendNotification } from "../../../lib/api";
+import { sendNotification } from "../../../../lib/api";
 
 export default function SendNotification({ users }) {
   const [message, setMessage] = useState("");
