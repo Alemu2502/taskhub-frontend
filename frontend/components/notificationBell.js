@@ -116,7 +116,7 @@ export default function NotificationBell() {
 
   return (
     <button
-      onClick={() => router.push("/notifications")}
+      onClick={() => router.push("/dashboard/notifications")}
       className={`
         flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
         text-gray-700 dark:text-gray-300
