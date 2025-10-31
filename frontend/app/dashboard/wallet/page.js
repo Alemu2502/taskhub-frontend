@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { userAPI } from '../../../lib/api';
+import { userAPI } from '../../../lib/api.js';
 import toast from 'react-hot-toast';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 15, 20, 25, 50, 75, 100];
