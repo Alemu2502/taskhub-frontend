@@ -1,7 +1,8 @@
 // NotificationBell.js
 import { useState, useEffect } from "react";
 import { getMyNotifications, markNotificationRead } from "../lib/api";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/navigation";
+
 
 export default function NotificationBell({ userId }) {
   const [unread, setUnread] = useState(0);

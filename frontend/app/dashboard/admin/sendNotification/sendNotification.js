@@ -52,7 +52,7 @@ export default function SendNotification({ users = [] }) {
   return (
     <>
       <Toast message={toast.message} type={toast.type} onClose={() => setToast({ message: "" })} />
-      <div className="p-6 bg-white border rounded">
+      <div className="max-w-2xl mx-auto text-gray-800 text-bold bg-white p-8 rounded-2xl shadow mt-10 mb-10 border ">
         <label className="block mb-2 font-bold">Notification Message</label>
         <textarea
           className="w-full border mb-2 p-2"
