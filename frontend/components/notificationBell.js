@@ -4,7 +4,7 @@ import { getMyNotifications } from "../lib/api";
 import { FiBell } from "react-icons/fi";
 import jwt_decode from "jwt-decode";
 
-// Utility to get userId from JWT cookie
+// Get userId from the JWT token cookie
 function getUserIdFromCookie() {
   if (typeof document === "undefined") return null;
   const match = document.cookie.match(/token=([^;]+)/);
@@ -17,7 +17,6 @@ function getUserIdFromCookie() {
   }
 }
 
-// Props: sidebar (optional, for context styling if needed)
 export default function NotificationBell({ sidebar }) {
   const [unread, setUnread] = useState(0);
 
@@ -33,7 +32,7 @@ export default function NotificationBell({ sidebar }) {
       }
     }
     fetchAndCount();
-    intervalId = setInterval(fetchAndCount, 10000); // Auto-refresh every 10s
+    intervalId = setInterval(fetchAndCount, 10000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -42,7 +41,7 @@ export default function NotificationBell({ sidebar }) {
       <FiBell size={20} />
       <span>Notification</span>
       {unread > 0 && (
-        <span className="absolute -top-2 left-16 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center px-1.5 animate-pulse">
+        <span className="absolute -top-2 left-24 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center px-1.5 animate-pulse">
           {unread}
         </span>
       )}
