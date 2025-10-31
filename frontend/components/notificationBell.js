@@ -1,72 +1,110 @@
-import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { getMyNotifications } from "../lib/api";
-import { FiBell } from "react-icons/fi";
-import jwt_decode from "jwt-decode";
+'use client';
 
-// Utility to get userId from JWT cookie
-function getUserIdFromCookie() {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/token=([^;]+)/);
-  if (!match) return null;
-  try {
-    const decoded = jwt_decode(match[1]);
-    return decoded.userId || decoded.id || decoded._id;
-  } catch {
-    return null;
-  }
-}
+import { useEffect, useState } from 'react';
+import { getMyNotifications, markNotificationRead } from '../lib/api';
 
-export default function NotificationBell() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [unread, setUnread] = useState(0);
+export default function NotificationsPanel({ onClose }) {
+  const [userId, setUserId] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [hovered, setHovered] = useState(null);
 
-  // LIVE AUTO-REFRESH
   useEffect(() => {
-    let intervalId;
-    const userId = getUserIdFromCookie();
-    async function fetchAndCount() {
-      if (userId) {
-        const notifications = await getMyNotifications(userId);
-        setUnread(
-          notifications.filter((n) => !n.readBy?.includes(userId)).length
-        );
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const finalId = user._id || user.id;
+        setUserId(finalId);
       }
-    }
-    fetchAndCount();
-    intervalId = setInterval(fetchAndCount, 10000); // 10s auto-refresh
-    return () => clearInterval(intervalId);
+    } catch {}
+    setLoading(false);
   }, []);
 
-  const isActive = pathname && pathname.startsWith("/dashboard/notifications");
+  useEffect(() => {
+    if (!userId) return;
+    setLoading(true);
+    setError('');
+    getMyNotifications(userId)
+      .then((data) => {
+        setNotifications(data || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('Could not fetch notifications.');
+        setLoading(false);
+      });
+  }, [userId]);
+
+  const handleMarkRead = async (id) => {
+    try {
+      await markNotificationRead(id, userId);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n._id === id ? { ...n, readBy: [...(n.readBy || []), userId] } : n
+        )
+      );
+    } catch (e) {
+      alert('Failed to mark as read!');
+    }
+  };
 
   return (
-    <button
-      onClick={() => router.push("/dashboard/notifications")}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full font-medium relative
-        ${
-          isActive
-            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
-            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-        }
-      `}
-      style={{ outline: "none", border: "none", background: "none" }}
-    >
-      <FiBell size={20} />
-      <span className="relative">
-        Notification
-        {unread > 0 && (
-          <span
-            className={`
-              absolute -top-3 left-20 min-w-[20px] h-[20px]
-              rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center px-1.5 animate-pulse
-            `}
-          >
-            {unread}
-          </span>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-primary-600 dark:text-primary-400">
+          Notifications
+        </h2>
+        <button
+          onClick={onClose}
+          className="bg-gray-200 dark:bg-gray-700 rounded px-3 py-1 text-xs font-semibold"
+        >
+          Close
+        </button>
+      </div>
+      <div className="space-y-4">
+        {loading ? (
+          <div>Loading notifications...</div>
+        ) : error ? (
+          <div className="text-red-600">{error}</div>
+        ) : notifications.length === 0 ? (
+          <div className="text-gray-500">No notifications yet.</div>
+        ) : (
+          <ul>
+            {notifications.map((n) => {
+              const isRead = n.readBy?.includes(userId);
+              const isHovered = hovered === n._id;
+              return (
+                <li
+                  key={n._id}
+                  className={`flex items-center justify-between group mb-3 rounded-lg cursor-pointer transition-colors px-6 py-5 font-medium text-gray-800 dark:text-gray-100
+                    ${isRead
+                      ? isHovered
+                        ? 'bg-blue-100 dark:bg-blue-900/70'
+                        : 'bg-gray-100 dark:bg-gray-700'
+                      : isHovered
+                      ? 'bg-blue-200 dark:bg-blue-900/80'
+                      : 'bg-blue-50 dark:bg-primary-900/30'}
+                  `}
+                  onMouseEnter={() => setHovered(n._id)}
+                  onMouseLeave={() => setHovered(null)}
+                  onClick={() => {
+                    if (!isRead) handleMarkRead(n._id);
+                  }}
+                >
+                  <span>{n.message}</span>
+                  {!isRead && (
+                    <span className="ml-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full group-hover:bg-blue-600">
+                      New
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
-      </span>
-    </button>
+      </div>
+    </div>
   );
 }
