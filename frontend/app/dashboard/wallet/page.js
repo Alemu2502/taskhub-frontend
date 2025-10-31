@@ -10,7 +10,7 @@ export default function WalletPage() {
   const [wallet, setWallet] = useState({
     balance: 0,
     totalEarned: 0,
-    totalWithdrawn: 0
+    totalWithdrawn: 0,
   });
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ export default function WalletPage() {
   const [withdrawData, setWithdrawData] = useState({
     amount: '',
     method: 'telebirr',
-    address: ''
+    address: '',
   });
   const [pageSize, setPageSize] = useState(5);
 
@@ -34,7 +34,7 @@ export default function WalletPage() {
       const walletData = response.data?.data?.wallet || {
         balance: 0,
         totalEarned: 0,
-        totalWithdrawn: 0
+        totalWithdrawn: 0,
       };
       setWallet(walletData);
     } catch (error) {
@@ -43,7 +43,7 @@ export default function WalletPage() {
       setWallet({
         balance: 0,
         totalEarned: 0,
-        totalWithdrawn: 0
+        totalWithdrawn: 0,
       });
     } finally {
       setLoading(false);
@@ -87,18 +87,13 @@ export default function WalletPage() {
       return;
     }
 
-    if (withdrawData.method === 'bep20') {
-      toast.error('Sorry, BEP20 withdrawals are temporarily unavailable. Please use Telebirr or CBE.');
-      return;
-    }
+    // No need for BEP20 early bailout now, handled by disabling submit
 
-    if (!validateAddress()) {
+    if (!validateAddress() && withdrawData.method !== 'bep20') {
       if (withdrawData.method === 'telebirr') {
         toast.error('Telebirr number must be in the format +2519XXXXXXXX');
       } else if (withdrawData.method === 'cbe') {
         toast.error('CBE account must be 13 digits and start with 1000');
-      } else if (withdrawData.method === 'bep20') {
-        toast.error('Invalid BEP20 address');
       } else {
         toast.error('Invalid account information');
       }
@@ -110,7 +105,7 @@ export default function WalletPage() {
       await userAPI.requestWithdrawal({
         amount: withdrawData.amount,
         method: withdrawData.method,
-        accountDetails: withdrawData.address
+        accountDetails: withdrawData.address,
       });
       toast.dismiss();
       toast.success('Withdrawal request submitted successfully');
@@ -181,7 +176,9 @@ export default function WalletPage() {
                     min="1"
                     max={wallet?.balance || 0}
                     value={withdrawData.amount}
-                    onChange={(e) => setWithdrawData({ ...withdrawData, amount: e.target.value })}
+                    onChange={(e) =>
+                      setWithdrawData({ ...withdrawData, amount: e.target.value })
+                    }
                     className="input-field"
                     required
                   />
@@ -193,7 +190,9 @@ export default function WalletPage() {
                   <label className="label text-blue-700">Withdrawal Method</label>
                   <select
                     value={withdrawData.method}
-                    onChange={(e) => setWithdrawData({ ...withdrawData, method: e.target.value, address: '' })}
+                    onChange={(e) =>
+                      setWithdrawData({ ...withdrawData, method: e.target.value, address: '' })
+                    }
                     className="input-field"
                     required
                   >
@@ -205,11 +204,11 @@ export default function WalletPage() {
                 {withdrawData.method === 'bep20' ? (
                   <div className="p-3 mb-2 rounded bg-yellow-50 border border-yellow-300 text-yellow-800 font-medium text-sm flex items-center gap-2">
                     <svg className="inline-block mr-2" width="20" height="20" viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="10" fill="#FDE68A"/>
-                      <path d="M10 5V11" stroke="#D97706" strokeWidth="2" strokeLinecap="round"/>
-                      <circle cx="10" cy="14" r="1" fill="#D97706"/>
+                      <circle cx="10" cy="10" r="10" fill="#FDE68A" />
+                      <path d="M10 5V11" stroke="#D97706" strokeWidth="2" strokeLinecap="round" />
+                      <circle cx="10" cy="14" r="1" fill="#D97706" />
                     </svg>
-                    Sorry, withdrawal via BEP20 is temporarily unavailable. 
+                    Sorry, withdrawal via BEP20 is temporarily unavailable.
                     <span className="font-semibold ml-1">Please choose Telebirr or CBE Bank.</span>
                     <br />
                     <span className="block text-xs text-yellow-700 mt-1">
@@ -219,24 +218,32 @@ export default function WalletPage() {
                 ) : (
                   <div>
                     <label className="label text-blue-700">
-                      {withdrawData.method === 'telebirr' ? 'Telebirr Number' : 'Bank Account Number'}
+                      {withdrawData.method === 'telebirr'
+                        ? 'Telebirr Number'
+                        : 'Bank Account Number'}
                     </label>
                     <input
                       type="text"
                       value={withdrawData.address}
-                      onChange={(e) => setWithdrawData({ ...withdrawData, address: e.target.value })}
+                      onChange={(e) =>
+                        setWithdrawData({ ...withdrawData, address: e.target.value })
+                      }
                       className="input-field"
                       required
                       placeholder={
                         withdrawData.method === 'telebirr' ? '+2519...' : '1000...'
                       }
                     />
-                    {withdrawData.method === 'telebirr' && withdrawData.address && !/^\+2519\d{8}$/.test(withdrawData.address) && (
-                      <div className="text-xs text-red-600 mt-1">Format must be +2519XXXXXXXX</div>
-                    )}
-                    {withdrawData.method === 'cbe' && withdrawData.address && !/^1000\d{9}$/.test(withdrawData.address) && (
-                      <div className="text-xs text-red-600 mt-1">CBE must start with 1000 and be 13 digits</div>
-                    )}
+                    {withdrawData.method === 'telebirr' &&
+                      withdrawData.address &&
+                      !/^\+2519\d{8}$/.test(withdrawData.address) && (
+                        <div className="text-xs text-red-600 mt-1">Format must be +2519XXXXXXXX</div>
+                      )}
+                    {withdrawData.method === 'cbe' &&
+                      withdrawData.address &&
+                      !/^1000\d{9}$/.test(withdrawData.address) && (
+                        <div className="text-xs text-red-600 mt-1">CBE must start with 1000 and be 13 digits</div>
+                      )}
                   </div>
                 )}
                 {withdrawData.method !== 'bep20' && (
@@ -283,47 +290,63 @@ export default function WalletPage() {
               <tbody>
                 {pagedWithdrawals.length > 0 ? (
                   pagedWithdrawals.map((w, index) => (
-                    <tr key={w._id}
-                        className={`hover:bg-blue-50 transition ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                    <tr
+                      key={w._id}
+                      className={`hover:bg-blue-50 transition ${
+                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                      }`}
+                    >
                       <td className="py-3 px-4 border-b border-r font-semibold text-blue-900">${w.amount}</td>
                       <td className="py-3 px-4 border-b border-r text-blue-800 font-semibold capitalize">{w.method}</td>
                       <td className="py-3 px-4 border-b border-r text-gray-600">{w.accountDetails}</td>
                       <td className="py-3 px-4 border-b border-r capitalize font-semibold">
-                        <span className={
-                          "px-2 py-1 rounded text-xs font-bold border " +
-                          (w.status === 'completed'
-                            ? 'bg-green-100 text-green-800 border-green-300'
-                            : w.status === 'rejected'
-                            ? 'bg-red-100 text-red-700 border-red-300'
-                            : w.status === 'processing'
-                            ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
-                            : 'bg-blue-100 text-blue-700 border-blue-300')
-                        }>
+                        <span
+                          className={
+                            'px-2 py-1 rounded text-xs font-bold border ' +
+                            (w.status === 'completed'
+                              ? 'bg-green-100 text-green-800 border-green-300'
+                              : w.status === 'rejected'
+                              ? 'bg-red-100 text-red-700 border-red-300'
+                              : w.status === 'processing'
+                              ? 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                              : 'bg-blue-100 text-blue-700 border-blue-300')
+                          }
+                        >
                           {w.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 border-b border-r text-blue-800">{w.requestedAt ? new Date(w.requestedAt).toLocaleString() : "-"}</td>
-                      <td className="py-3 px-4 border-b text-blue-800">{w.processedAt ? new Date(w.processedAt).toLocaleString() : "-"}</td>
+                      <td className="py-3 px-4 border-b border-r text-blue-800">
+                        {w.requestedAt ? new Date(w.requestedAt).toLocaleString() : '-'}
+                      </td>
+                      <td className="py-3 px-4 border-b text-blue-800">
+                        {w.processedAt ? new Date(w.processedAt).toLocaleString() : '-'}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center text-gray-400 py-10">No transactions yet</td>
+                    <td colSpan="6" className="text-center text-gray-400 py-10">
+                      No transactions yet
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
             {withdrawals.length > 5 && (
               <div className="flex justify-end items-center py-3 px-6 gap-2">
-                <label htmlFor="page-size-select" className="text-sm text-gray-700 dark:text-gray-200">Rows to show:</label>
+                <label htmlFor="page-size-select" className="text-sm text-gray-700 dark:text-gray-200">
+                  Rows to show:
+                </label>
                 <select
                   id="page-size-select"
                   value={pageSize}
-                  onChange={e => setPageSize(Number(e.target.value))}
+                  onChange={(e) => setPageSize(Number(e.target.value))}
                   className="border border-gray-300 dark:border-gray-700 rounded px-2 py-1 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
                 >
-                  {PAGE_SIZE_OPTIONS.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
+                  {PAGE_SIZE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </div>

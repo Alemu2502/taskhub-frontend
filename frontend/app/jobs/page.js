@@ -94,9 +94,9 @@ export default function Jobs() {
           </div>
           <form 
             onSubmit={handleApplyFilters}
-            className="flex flex-row flex-wrap items-end gap-4 bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200"
+            className="bg-white p-6 mb-8 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-4"
           >
-            <div className="flex-1 min-w-[160px]">
+            <div className="w-full">
               <label className="block text-sm font-medium text-gray-900 mb-1">Platform</label>
               <select
                 className="input-field w-full"
@@ -108,7 +108,7 @@ export default function Jobs() {
                 ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[160px]">
+            <div className="w-full">
               <label className="block text-sm font-medium text-gray-900 mb-1">Sort By</label>
               <select
                 className="input-field w-full"
@@ -120,7 +120,7 @@ export default function Jobs() {
                 ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[240px]">
+            <div className="w-full">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Search</label>
               <input
                 type="text"
@@ -130,13 +130,15 @@ export default function Jobs() {
                 onChange={handleSearchInput}
               />
             </div>
-            <button 
-              type="submit" 
-              className="h-12 w-full md:w-auto rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-5 md:mt-0"
-              style={{ whiteSpace: 'nowrap' }}
-            >
-              Apply
-            </button>
+            <div className="w-full">
+              <button 
+                type="submit" 
+                className="h-12 w-full rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 text-sm mt-2"
+                style={{ whiteSpace: 'nowrap' }}
+              >
+                Apply
+              </button>
+            </div>
           </form>
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
