@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getMyNotifications, markNotificationRead } from "../../lib/api";
+import { getMyNotifications, markNotificationRead } from "../lib/api";
 
-export default function NotificationsPage({ searchParams }) {
-  const userId = searchParams?.userId; 
+export default function NotificationsPage() {
+  // CHANGE THIS LINE! Replace with your actual auth/user fetch logic
+  const userId = typeof window !== "undefined" && window.localStorage.getItem("userId");
 
   const [notifications, setNotifications] = useState([]);
   useEffect(() => {
@@ -14,7 +15,6 @@ export default function NotificationsPage({ searchParams }) {
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>Notifications</h2>
       {notifications.length === 0 ? (
         <p>No notifications yet.</p>
       ) : (
