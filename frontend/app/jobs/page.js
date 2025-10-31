@@ -96,7 +96,7 @@ export default function Jobs() {
             onSubmit={handleApplyFilters}
             className="flex flex-row flex-wrap items-end gap-4 bg-white dark:bg-gray-800 p-6 mb-8 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700"
           >
-            <div className="flex-1 min-w-[160px]">
+            <div className="flex-1 min-w-[240px]">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Platform</label>
               <select
                 className="input-field w-full"
@@ -108,7 +108,7 @@ export default function Jobs() {
                 ))}
               </select>
             </div>
-            <div className="flex-1 min-w-[160px]">
+            <div className="flex-1 min-w-[240px]">
               <label className="block text-sm font-medium text-gray-900 dark:text-gray-300 mb-1">Sort By</label>
               <select
                 className="input-field w-full"

@@ -197,27 +197,26 @@ export default function WalletPage() {
                     className="input-field"
                     required
                   >
-                    <option value="bep20" disabled>BEP20 (USDT) – Unavailable</option>
+                    <option value="bep20">BEP20 (USDT)</option>
                     <option value="telebirr">Telebirr</option>
                     <option value="cbe">CBE Bank</option>
                   </select>
                 </div>
-                {withdrawData.method === 'bep20' && (
+                {withdrawData.method === 'bep20' ? (
                   <div className="p-3 mb-2 rounded bg-yellow-50 border border-yellow-300 text-yellow-800 font-medium text-sm flex items-center gap-2">
                     <svg className="inline-block mr-2" width="20" height="20" viewBox="0 0 20 20" fill="none">
                       <circle cx="10" cy="10" r="10" fill="#FDE68A"/>
                       <path d="M10 5V11" stroke="#D97706" strokeWidth="2" strokeLinecap="round"/>
                       <circle cx="10" cy="14" r="1" fill="#D97706"/>
                     </svg>
-                    Sorry, temporary withdrawal via BEP20 is unavailable. 
+                    Sorry, withdrawal via BEP20 is temporarily unavailable. 
                     <span className="font-semibold ml-1">Please choose Telebirr or CBE Bank.</span>
                     <br />
                     <span className="block text-xs text-yellow-700 mt-1">
-                      <b>Important:</b> Name on Telebirr or CBE must match your TaskHub account name exactly to avoid payout delay.
+                      <b>Reason:</b> Due to service issues, BEP20 payouts are paused for your security and compliance.
                     </span>
                   </div>
-                )}
-                {withdrawData.method !== 'bep20' && (
+                ) : (
                   <div>
                     <label className="label text-blue-700">
                       {withdrawData.method === 'telebirr' ? 'Telebirr Number' : 'Bank Account Number'}
@@ -246,7 +245,11 @@ export default function WalletPage() {
                   </div>
                 )}
                 <div className="flex gap-3">
-                  <button type="submit" className="btn-primary flex-1">
+                  <button
+                    type="submit"
+                    className="btn-primary flex-1"
+                    disabled={withdrawData.method === 'bep20'}
+                  >
                     Submit Request
                   </button>
                   <button
