@@ -253,7 +253,7 @@ import {
   FiUsers, FiDollarSign, FiFileText, FiCreditCard, FiBell
 } from 'react-icons/fi';
 import NotificationBell from '../../components/notificationBell';
-import NotificationsPanel from '../../components/NotificationsPanel'; // See next step
+import NotificationsPanel from '../../components/notificationsPanel'; // See next step
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,110 +1,51 @@
 'use client';
+import { useState, useEffect } from "react";
+import { getMyNotifications } from "../lib/api";
+import { FiBell } from "react-icons/fi";
+import jwt_decode from "jwt-decode";
 
-import { useEffect, useState } from 'react';
-import { getMyNotifications, markNotificationRead } from '../lib/api';
+// Utility to get userId from JWT cookie
+function getUserIdFromCookie() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/token=([^;]+)/);
+  if (!match) return null;
+  try {
+    const decoded = jwt_decode(match[1]);
+    return decoded.userId || decoded.id || decoded._id;
+  } catch {
+    return null;
+  }
+}
 
-export default function NotificationsPanel({ onClose }) {
-  const [userId, setUserId] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [hovered, setHovered] = useState(null);
+// Props: sidebar (optional, for context styling if needed)
+export default function NotificationBell({ sidebar }) {
+  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        const finalId = user._id || user.id;
-        setUserId(finalId);
+    let intervalId;
+    const userId = getUserIdFromCookie();
+    async function fetchAndCount() {
+      if (userId) {
+        const notifications = await getMyNotifications(userId);
+        setUnread(
+          notifications.filter((n) => !n.readBy?.includes(userId)).length
+        );
       }
-    } catch {}
-    setLoading(false);
+    }
+    fetchAndCount();
+    intervalId = setInterval(fetchAndCount, 10000); // Auto-refresh every 10s
+    return () => clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    if (!userId) return;
-    setLoading(true);
-    setError('');
-    getMyNotifications(userId)
-      .then((data) => {
-        setNotifications(data || []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Could not fetch notifications.');
-        setLoading(false);
-      });
-  }, [userId]);
-
-  const handleMarkRead = async (id) => {
-    try {
-      await markNotificationRead(id, userId);
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, readBy: [...(n.readBy || []), userId] } : n
-        )
-      );
-    } catch (e) {
-      alert('Failed to mark as read!');
-    }
-  };
-
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-primary-600 dark:text-primary-400">
-          Notifications
-        </h2>
-        <button
-          onClick={onClose}
-          className="bg-gray-200 dark:bg-gray-700 rounded px-3 py-1 text-xs font-semibold"
-        >
-          Close
-        </button>
-      </div>
-      <div className="space-y-4">
-        {loading ? (
-          <div>Loading notifications...</div>
-        ) : error ? (
-          <div className="text-red-600">{error}</div>
-        ) : notifications.length === 0 ? (
-          <div className="text-gray-500">No notifications yet.</div>
-        ) : (
-          <ul>
-            {notifications.map((n) => {
-              const isRead = n.readBy?.includes(userId);
-              const isHovered = hovered === n._id;
-              return (
-                <li
-                  key={n._id}
-                  className={`flex items-center justify-between group mb-3 rounded-lg cursor-pointer transition-colors px-6 py-5 font-medium text-gray-800 dark:text-gray-100
-                    ${isRead
-                      ? isHovered
-                        ? 'bg-blue-100 dark:bg-blue-900/70'
-                        : 'bg-gray-100 dark:bg-gray-700'
-                      : isHovered
-                      ? 'bg-blue-200 dark:bg-blue-900/80'
-                      : 'bg-blue-50 dark:bg-primary-900/30'}
-                  `}
-                  onMouseEnter={() => setHovered(n._id)}
-                  onMouseLeave={() => setHovered(null)}
-                  onClick={() => {
-                    if (!isRead) handleMarkRead(n._id);
-                  }}
-                >
-                  <span>{n.message}</span>
-                  {!isRead && (
-                    <span className="ml-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full group-hover:bg-blue-600">
-                      New
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </div>
-    </div>
+    <span className="relative flex items-center gap-3">
+      <FiBell size={20} />
+      <span>Notification</span>
+      {unread > 0 && (
+        <span className="absolute -top-2 left-16 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center px-1.5 animate-pulse">
+          {unread}
+        </span>
+      )}
+    </span>
   );
 }
