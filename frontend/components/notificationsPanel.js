@@ -52,7 +52,7 @@ export default function NotificationsPanel({ onClose }) {
 
   return (
     <section
-      className="w-full max-w-2xl mx-auto lg:mx-0 bg-white dark:bg-gray-800 rounded-xl shadow p-6"
+      className="w-full max-w-xl mx-auto sm:mx-0 bg-white dark:bg-gray-800 rounded-xl shadow p-6"
       style={{ minWidth: 300 }}
     >
       <div className="flex items-center justify-between mb-4">

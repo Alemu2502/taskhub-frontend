@@ -253,13 +253,13 @@ import {
   FiUsers, FiDollarSign, FiFileText, FiCreditCard, FiBell
 } from 'react-icons/fi';
 import NotificationBell from '../../components/notificationBell';
-import NotificationsPanel from '../../components/notificationsPanel'; // See next step
+import NotificationsPanel from '../../components/notificationsPanel';
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState(null);
-  const [showNotifications, setShowNotifications] = useState(false); // NEW
+  const [showNotifications, setShowNotifications] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -378,11 +378,12 @@ export default function DashboardLayout({ children }) {
         </div>
       </header>
 
-      {/* Sidebar */}
+      {/* Sidebar: hides on mobile when notifications open */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} 
+          ${showNotifications ? 'hidden sm:block' : ''}
+          lg:translate-x-0`}
       >
         <div className="h-full pt-20 pb-4 overflow-y-auto">
           <div className="px-3 space-y-1">
@@ -414,7 +415,7 @@ export default function DashboardLayout({ children }) {
                       <Icon size={20} />
                       <span>{item.name}</span>
                     </Link>
-                    {/* NotificationBell as nav, opens inline notifications (NO navigation) */}
+                    {/* NotificationBell button */}
                     <button
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full font-medium relative ${
                         showNotifications
@@ -424,7 +425,7 @@ export default function DashboardLayout({ children }) {
                       style={{ outline: 'none', border: 'none', background: 'none' }}
                       onClick={() => setShowNotifications((v) => !v)}
                     >
-                      <NotificationBell sidebar />
+                      <NotificationBell />
                     </button>
                   </div>
                 );
@@ -464,12 +465,12 @@ export default function DashboardLayout({ children }) {
         />
       )}
 
-      <main className="lg:pl-64 pt-16 flex gap-4">
-        <div className="flex-1">
+      <main className="lg:pl-64 pt-16 flex gap-4 w-full">
+        <div className={`flex-1 ${showNotifications ? "hidden sm:block" : ""}`}>
           {!showNotifications && children}
         </div>
         {showNotifications && (
-          <div className="max-w-xl w-full mr-4 mt-8">
+          <div className="flex-1 w-full max-w-xl mx-auto sm:mx-0 mt-8">
             <NotificationsPanel onClose={() => setShowNotifications(false)} />
           </div>
         )}
