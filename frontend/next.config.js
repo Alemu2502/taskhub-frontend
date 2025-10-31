@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export', // <-- THIS IS CRITICAL
   images: {
     domains: ['localhost'],
   },
@@ -9,4 +10,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = nextConfig;
