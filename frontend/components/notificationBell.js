@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { getMyNotifications } from "../lib/api";
 import { FiBell } from "react-icons/fi";
 import jwt_decode from "jwt-decode";
@@ -19,13 +19,13 @@ function getUserIdFromCookie() {
 
 export default function NotificationBell() {
   const router = useRouter();
+  const pathname = usePathname();
   const [unread, setUnread] = useState(0);
 
-  // Fetch unread notifications AND auto-refresh
+  // LIVE AUTO-REFRESH
   useEffect(() => {
     let intervalId;
     const userId = getUserIdFromCookie();
-
     async function fetchAndCount() {
       if (userId) {
         const notifications = await getMyNotifications(userId);
@@ -34,39 +34,39 @@ export default function NotificationBell() {
         );
       }
     }
-
     fetchAndCount();
-    intervalId = setInterval(fetchAndCount, 10000); // 10 seconds
-
+    intervalId = setInterval(fetchAndCount, 10000); // 10s auto-refresh
     return () => clearInterval(intervalId);
   }, []);
 
+  const isActive = pathname && pathname.startsWith("/dashboard/notifications");
+
   return (
     <button
-      onClick={() => router.push("/notifications")}
-      className={`
-        flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-        text-gray-700 dark:text-gray-300
-        hover:bg-gray-100 dark:hover:bg-gray-700
-        font-medium w-full relative
+      onClick={() => router.push("/dashboard/notifications")}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full font-medium relative
+        ${
+          isActive
+            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
+            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        }
       `}
+      style={{ outline: "none", border: "none", background: "none" }}
     >
+      <FiBell size={20} />
       <span className="relative">
-        <FiBell size={20} />
+        Notification
         {unread > 0 && (
           <span
             className={`
-              absolute -top-2 -right-2 min-w-[20px] h-[20px] rounded-full 
-              bg-red-500 text-white text-xs font-bold flex items-center justify-center
-              px-1.5
-              animate-pulse
+              absolute -top-3 left-20 min-w-[20px] h-[20px]
+              rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center px-1.5 animate-pulse
             `}
           >
             {unread}
           </span>
         )}
       </span>
-      <span>Notification</span>
     </button>
   );
 }

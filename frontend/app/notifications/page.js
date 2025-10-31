@@ -1,144 +1,76 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { getMyNotifications, markNotificationRead } from '../../lib/api';
+// components/NotificationBell.js
+import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { getMyNotifications } from "../../lib/api";
+import { FiBell } from "react-icons/fi";
+import jwt_decode from "jwt-decode";
 
-export default function NotificationsPage() {
+// Utility to get userId from JWT cookie
+function getUserIdFromCookie() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/token=([^;]+)/);
+  if (!match) return null;
+  try {
+    const decoded = jwt_decode(match[1]);
+    return decoded.userId || decoded.id || decoded._id;
+  } catch {
+    return null;
+  }
+}
+
+export default function NotificationBell({ sidebar = false }) {
   const router = useRouter();
-  const [userId, setUserId] = useState(null);
-  const [userObj, setUserObj] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [hovered, setHovered] = useState(null);
+  const pathname = usePathname();
+  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        setUserObj(user);
-        const finalId = user._id || user.id;
-        if (finalId) {
-          setUserId(finalId);
-        } else {
-          setError('User found, but id key missing.');
-        }
-      } else {
-        setError('Not logged in — no user in localStorage.');
+    let intervalId;
+    const userId = getUserIdFromCookie();
+    async function fetchAndCount() {
+      if (userId) {
+        const notifications = await getMyNotifications(userId);
+        setUnread(
+          notifications.filter((n) => !n.readBy?.includes(userId)).length
+        );
       }
-    } catch (e) {
-      setError('Could not parse user from localStorage.');
     }
-    setLoading(false);
+    fetchAndCount();
+    intervalId = setInterval(fetchAndCount, 10000); // 10 seconds
+    return () => clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    if (!userId) return;
-    setLoading(true);
-    setError('');
-    getMyNotifications(userId)
-      .then((data) => {
-        setNotifications(data || []);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('Could not fetch notifications.');
-        setLoading(false);
-      });
-  }, [userId]);
+  // Highlight menu if active
+  const isActive = pathname && pathname.startsWith("/dashboard/notifications");
 
-  const handleMarkRead = async (id) => {
-    try {
-      await markNotificationRead(id, userId);
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n._id === id ? { ...n, readBy: [...(n.readBy || []), userId] } : n
-        )
-      );
-    } catch (e) {
-      alert('Failed to mark as read!');
-    }
-  };
-
+  // Style: same as sidebar nav
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col lg:flex-row">
-      {/* Sidebar/header will be injected by your DashboardLayout */}
-      <div className="flex-1 flex justify-center items-start px-2 py-10">
-        <div className="w-full max-w-lg">
-          {/* Header and Back to Dashboard */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-              Notifications
-            </h2>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="bg-primary-600 hover:bg-primary-700 text-white font-semibold px-4 py-2 rounded-lg text-sm shadow transition"
-            >
-              Back to Dashboard
-            </button>
-          </div>
-          <div className="rounded-xl shadow bg-white dark:bg-gray-800 p-0">
-            <div className="space-y-6 p-4">
-              {loading ? (
-                <div className="py-10 text-center text-lg font-medium text-gray-700 dark:text-gray-200">
-                  Loading notifications...
-                </div>
-              ) : error ? (
-                <div className="bg-white border border-red-400 rounded-xl py-8 px-6 text-red-600 dark:text-red-400 text-center shadow">
-                  <b>{error}</b>
-                  <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 break-all">
-                    user: {localStorage.getItem('user')}
-                  </div>
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="text-gray-600 dark:text-gray-300 text-center py-8">
-                  No notifications yet.
-                </div>
-              ) : (
-                <ul>
-                  {notifications.map((n) => {
-                    const isRead = n.readBy?.includes(userId);
-                    const isHovered = hovered === n._id;
-                    return (
-                      <li
-                        key={n._id}
-                        className={`
-                          flex items-center justify-between group mb-3
-                          rounded-lg cursor-pointer transition-colors px-6 py-5
-                          font-medium text-gray-800 dark:text-gray-100
-                          ${
-                            isRead
-                              ? isHovered
-                                ? 'bg-blue-100 dark:bg-blue-900/70'
-                                : 'bg-gray-100 dark:bg-gray-700'
-                              : isHovered
-                              ? 'bg-blue-200 dark:bg-blue-900/80'
-                              : 'bg-blue-50 dark:bg-primary-900/30'
-                          }
-                        `}
-                        onMouseEnter={() => setHovered(n._id)}
-                        onMouseLeave={() => setHovered(null)}
-                        onClick={() => {
-                          if (!isRead) handleMarkRead(n._id);
-                        }}
-                      >
-                        <span>{n.message}</span>
-                        {!isRead && (
-                          <span className="ml-3 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full group-hover:bg-blue-600">
-                            New
-                          </span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <button
+      onClick={() => router.push('/dashboard/notifications')}
+      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full font-medium relative
+        ${
+          isActive
+            ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400"
+            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        }`
+      }
+      style={{ outline: "none", border: "none", background: "none" }}
+    >
+      <FiBell size={20} />
+      <span className="relative">
+        Notification
+        {unread > 0 && (
+          <span
+            className={`
+              ml-2 min-w-[20px] h-[20px] rounded-full 
+              bg-red-500 text-white text-xs font-bold flex items-center justify-center
+              px-1.5 absolute -top-2 left-14
+              animate-pulse
+            `}
+          >
+            {unread}
+          </span>
+        )}
+      </span>
+    </button>
   );
 }

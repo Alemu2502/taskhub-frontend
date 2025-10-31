@@ -189,7 +189,7 @@ export default function DashboardLayout({ children }) {
                       <span>{item.name}</span>
                     </Link>
                     {/* NotificationBell right after Wallet */}
-                      <NotificationBell />
+                      <NotificationBell  sidebar/>
                    
                   </div>
                 );
