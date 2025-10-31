@@ -23,7 +23,7 @@ const SORTS = [
   { value: 'high-to-low', label: 'Price: High to Low' },
 ];
 
-const PAGE_SIZE = 2; 
+const PAGE_SIZE = 12; 
 
 export default function Jobs() {
   const [allJobs, setAllJobs] = useState([]);
