@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 
 export default function JobCard({ job }) {
   const image = job.image || '/images/job-default.jpg';
