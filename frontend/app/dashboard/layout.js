@@ -113,10 +113,13 @@ export default function DashboardLayout({ children }) {
   };
 
   const handleLogout = () => {
+  if (authAPI && typeof authAPI.logout === "function") {
     authAPI.logout();
-    clearAuth();
-    router.push('/auth/login');
-  };
+  }
+  clearAuth();
+  router.push('/auth/login');
+};
+
 
   const userNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: FiHome },
