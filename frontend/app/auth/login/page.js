@@ -25,49 +25,49 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🔐 FRONTEND LOGIN ATTEMPT');
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('📧 Email:', formData.email);
-    console.log('🔒 Password length:', formData.password.length);
-    console.log('⏰ Timestamp:', new Date().toISOString());
+    // console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    // console.log('🔐 FRONTEND LOGIN ATTEMPT');
+    // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    // console.log('📧 Email:', formData.email);
+    // console.log('🔒 Password length:', formData.password.length);
+    // console.log('⏰ Timestamp:', new Date().toISOString());
 
     try {
-      console.log('📡 Sending login request to API...');
+     // console.log('📡 Sending login request to API...');
       const response = await authAPI.login(formData);
       
-      console.log('📥 Response received:', {
-        status: response.status,
-        success: response.data?.success,
-        message: response.data?.message,
-      });
+      // console.log('📥 Response received:', {
+      //   status: response.status,
+      //   success: response.data?.success,
+      //   message: response.data?.message,
+      // });
       
       if (response.data.success) {
         const { token, user } = response.data.data;
         
-        console.log('✅ Login successful!');
-        console.log('👤 User:', {
-          id: user.id,
-          // username: user.username,
-          email: user.email,
-          role: user.role,
-        });
-        console.log('🎫 Token received:', token ? 'Yes' : 'No');
+        //console.log('✅ Login successful!');
+        // console.log('👤 User:', {
+        //   id: user.id,
+        //   // username: user.username,
+        //   email: user.email,
+        //   role: user.role,
+        // });
+        // console.log('🎫 Token received:', token ? 'Yes' : 'No');
         
         // Store auth data
-        console.log('💾 Storing auth data...');
+        //console.log('💾 Storing auth data...');
         setAuth(token, user);
-        console.log('✅ Auth data stored in localStorage');
+       // console.log('✅ Auth data stored in localStorage');
         
         // Check if actually stored
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
-        console.log('🔍 Verification - Token in localStorage:', storedToken ? 'Yes' : 'No');
-        console.log('🔍 Verification - User in localStorage:', storedUser ? 'Yes' : 'No');
+        //console.log('🔍 Verification - Token in localStorage:', storedToken ? 'Yes' : 'No');
+        //console.log('🔍 Verification - User in localStorage:', storedUser ? 'Yes' : 'No');
         
-        if (storedToken) {
-          console.log('🔍 Token preview:', storedToken.substring(0, 20) + '...');
-        }
+        // if (storedToken) {
+        //   console.log('🔍 Token preview:', storedToken.substring(0, 20) + '...');
+        // }
         // if (storedUser) {
         //   console.log('🔍 Stored user:', JSON.parse(storedUser).username);
         // }
@@ -77,8 +77,8 @@ export default function Login() {
         console.log('🔄 Redirecting to /dashboard in 500ms...');
         // Force redirect after short delay
         setTimeout(() => {
-          console.log('🚀 Executing redirect now...');
-          console.log('🚀 Target URL: /dashboard');
+          //console.log('🚀 Executing redirect now...');
+          //console.log('🚀 Target URL: /dashboard');
           window.location.href = '/dashboard';
         }, 500);
       } else {
@@ -86,19 +86,19 @@ export default function Login() {
         toast.error(response.data.message || 'Login failed');
       }
     } catch (error) {
-      console.error('❌ LOGIN ERROR');
-      console.error('Error object:', error);
-      console.error('Response data:', error.response?.data);
-      console.error('Response status:', error.response?.status);
-      console.error('Error message:', error.message);
+      // console.error('❌ LOGIN ERROR');
+      // console.error('Error object:', error);
+      // console.error('Response data:', error.response?.data);
+      // console.error('Response status:', error.response?.status);
+      // console.error('Error message:', error.message);
       
       const errorMessage = error.response?.data?.message || 'Login failed. Please check your credentials.';
-      console.log('📢 Showing error to user:', errorMessage);
+     // console.log('📢 Showing error to user:', errorMessage);
       toast.error(errorMessage);
     } finally {
       setLoading(false);
-      console.log('🏁 Login attempt finished');
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      // console.log('🏁 Login attempt finished');
+      // console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
     }
   };
 

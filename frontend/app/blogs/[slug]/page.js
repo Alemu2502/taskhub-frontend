@@ -146,16 +146,6 @@ export default function BlogDetails() {
               dangerouslySetInnerHTML={{ __html: blog.content }}
             />
           </article>
-
-          {/* Back Button */}
-          <div className="mt-8 text-center">
-            <button 
-              onClick={() => router.push('/blogs')} 
-              className="btn-secondary"
-            >
-              ← Back to All Blogs
-            </button>
-          </div>
         </div>
       </div>
 
