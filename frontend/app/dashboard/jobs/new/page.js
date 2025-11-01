@@ -119,7 +119,7 @@ export default function NewJobPage() {
               className="taskhub-input w-full px-4 py-2 rounded-lg border text-gray-800 text-bold"
               type="number"
               value={form.reward}
-              min={0.01}
+              min={0}
               step="0.01"
               onChange={e => setForm({ ...form, reward: e.target.value })}
               required
