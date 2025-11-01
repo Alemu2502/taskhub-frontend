@@ -20,12 +20,13 @@ export default function JobCard({ job }) {
         </div>
         <div className="flex flex-col flex-1 px-4 pt-3 pb-4">
           <h3 className="text-base font-bold mb-1">{job.title}</h3>
-          <div className="text-xs text-gray-500 mb-2">
-            published {job.createdAt ? formatDistanceToNow(new Date(job.createdAt), { addSuffix: true }) : ''}
-          </div>
+         <div className="text-xs text-primary-600 font-semibold mb-2">
+          published at: {job.createdAt ? format(new Date(job.createdAt), "yyyy-MM-dd hh:mm a") : ''}
+        </div>
+
           {/* Big company style: Vacancy Ava line */}
           <div className="mb-3 text-[15px] font-bold text-primary-600 tracking-wide">
-            Vacancy&nbsp;Ava: <span className={availableVacancy > 0 ? "text-green-600" : "text-red-500"}>
+            AVAILABL&nbsp;VACANCY : <span className={availableVacancy > 0 ? "text-green-600" : "text-red-500"}>
               {availableVacancy}
             </span>
           </div>
