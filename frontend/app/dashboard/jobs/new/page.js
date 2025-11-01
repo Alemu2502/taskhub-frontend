@@ -120,7 +120,7 @@ export default function NewJobPage() {
               type="number"
               value={form.reward}
               min={0}
-              step="0.01"
+              step="any"
               onChange={e => setForm({ ...form, reward: e.target.value })}
               required
               placeholder="0.05"
