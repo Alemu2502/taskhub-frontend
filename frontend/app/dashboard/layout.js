@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { getAuth, clearAuth } from '../../lib/auth';
-import { authAPI } from '../../lib/api';
+import { getAuth, clearAuth, authAPI, getMyNotifications } from '../../lib/auth';
+
 import {
   FiMenu,
   FiX,
@@ -16,21 +16,64 @@ import {
   FiMoon,
   FiUsers,
   FiDollarSign,
-  FiBarChart2,
   FiFileText,
   FiCreditCard,
   FiBell
 } from 'react-icons/fi';
-import NotificationBell from '../../components/notificationBell'; // <----- add this line
+import NotificationBell from '../../components/notificationBell';
+import jwt_decode from "jwt-decode";
+
+// Utility to get userId from JWT cookie
+function getUserIdFromCookie() {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(/token=([^;]+)/);
+  if (!match) return null;
+  try {
+    const decoded = jwt_decode(match[1]);
+    return decoded.userId || decoded.id || decoded._id;
+  } catch {
+    return null;
+  }
+}
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState(null);
+  const [unread, setUnread] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
 
-  // Redirect admin from "/dashboard" to "/dashboard/users"
+  // Unread Notification Counter Logic
+  useEffect(() => {
+    let intervalId;
+    const userId = getUserIdFromCookie();
+
+    async function fetchAndCount() {
+      if (userId) {
+        const notifications = await getMyNotifications(userId);
+        setUnread(notifications.filter(n => !n.readBy?.includes(userId)).length);
+      }
+    }
+
+    fetchAndCount();
+    intervalId = setInterval(fetchAndCount, 10000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Sidebar mobile close event
+  useEffect(() => {
+    function handleSidebarCloseEvent() {
+      setSidebarOpen(false);
+    }
+    window.addEventListener("sidebar:close", handleSidebarCloseEvent);
+    return () => {
+      window.removeEventListener("sidebar:close", handleSidebarCloseEvent);
+    };
+  }, []);
+
+  // Auth and darkmode logic
   useEffect(() => {
     const auth = getAuth();
     if (!auth) {
@@ -39,7 +82,6 @@ export default function DashboardLayout({ children }) {
     }
     setUser(auth.user);
 
-    // Admin default redirect
     if (
       auth.user &&
       auth.user.role === 'admin' &&
@@ -56,17 +98,6 @@ export default function DashboardLayout({ children }) {
       }
     }
   }, [router, pathname]);
-
-
-  useEffect(() => {
-  function handleSidebarCloseEvent() {
-    setSidebarOpen(false);
-  }
-  window.addEventListener("sidebar:close", handleSidebarCloseEvent);
-  return () => {
-    window.removeEventListener("sidebar:close", handleSidebarCloseEvent);
-  };
-}, []);
 
   const toggleDarkMode = () => {
     const newMode = !darkMode;
@@ -91,6 +122,7 @@ export default function DashboardLayout({ children }) {
     { name: 'Dashboard', href: '/dashboard', icon: FiHome },
     { name: 'Browse Jobs', href: '/dashboard/jobs', icon: FiBriefcase },
     { name: 'Wallet', href: '/dashboard/wallet', icon: FiCreditCard },
+    { name: 'Notification', href: '/dashboard/notifications', icon: FiBell },
     { name: 'Settings', href: '/dashboard/settings', icon: FiSettings },
   ];
 
@@ -183,30 +215,7 @@ export default function DashboardLayout({ children }) {
             {navigation.map((item, idx) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
-            
-              if (item.name === 'Wallet') {
-                return (
-                  <div key={item.name}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setSidebarOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                        isActive
-                          ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      <Icon size={20} />
-                      <span>{item.name}</span>
-                    </Link>
-                    {/* NotificationBell right after Wallet */}
-                   
-                      <NotificationBell  sidebar/>
-                      
-                    
-                  </div>
-                );
-              }
+
               return (
                 <Link
                   key={item.name}
@@ -219,7 +228,19 @@ export default function DashboardLayout({ children }) {
                   }`}
                 >
                   <Icon size={20} />
-                  <span>{item.name}</span>
+                  <span className="relative">
+                    {item.name}
+                    {item.name === 'Notification' && unread > 0 && (
+                      <span
+                        style={{
+                          color: 'red',
+                          marginLeft: 4,
+                          fontWeight: 'bold',
+                          fontSize: 'small',
+                        }}
+                      >^{unread}</span>
+                    )}
+                  </span>
                 </Link>
               );
             })}
