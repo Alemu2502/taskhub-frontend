@@ -12,10 +12,13 @@ export const metadata = {
   },
 }
 
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Explicit favicon for both browsers and Google */}
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body className={inter.className}>
         {children}
         <Toaster position="top-right" />
