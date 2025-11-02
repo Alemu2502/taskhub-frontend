@@ -39,7 +39,7 @@ export default function ManageJobs() {
   function ConReward({ reward }) {
     return (
       <span className="text-green-600 dark:text-green-300 font-semibold">
-        ${parseFloat(reward).toFixed(2)}
+      ${reward}
       </span>
     );
   }

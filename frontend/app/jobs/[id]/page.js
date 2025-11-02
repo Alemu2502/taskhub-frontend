@@ -167,7 +167,7 @@ export default function JobDetails() {
             </div>
           </div>
           <div className="py-3 border-b">
-            <span className="text-primary-600 font-bold text-lg">${job.reward?.toFixed?.(2) ?? job.reward}</span>
+            <span className="text-primary-600 font-bold text-lg">${job.reward}</span>
           </div>
           <div className="flex items-center gap-2 py-3 border-b">
             <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M8 2V4M12 2V4M3 8H17M5 6H15C16.1046 6 17 6.89543 17 8V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V8C3 6.89543 3.89543 6 5 6Z" stroke="#059669" strokeWidth="1.2"/></svg>
