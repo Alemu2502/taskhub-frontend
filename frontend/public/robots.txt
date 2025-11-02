@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://usetaskhub.netlify.app/sitemap.xml
