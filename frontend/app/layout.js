@@ -5,8 +5,8 @@ import { Toaster } from 'react-hot-toast'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'TaskHub - Earn Money by Engaging with Content',
-  description: 'Join TaskHub and turn your online engagement into earnings! Watch videos, follow social media accounts, and earn rewards.',
+  title: 'TaskHubOnline – Make Money Online Instantly (No Investment Needed!)',
+  description: 'Turn your online activity into real cash with TaskHubOnline! Watch videos, follow social pages, complete simple tasks, and get paid—100% free, no investment required.',
   icons: {
     icon: '/favicon.ico',
   },

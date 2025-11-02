@@ -115,8 +115,8 @@ export default function EditJobPage() {
           <input
             type="number"
             value={form.reward}
-            min="0.01"
-            step="0.01"
+            min="0"
+            step="any"
             onChange={e => setForm(f => ({ ...f, reward: e.target.value }))}
             className="w-full px-4 py-2 rounded-lg border"
             required
