@@ -32,7 +32,7 @@ export default function JobCard({ job }) {
           </div>
           <div className="flex-1" />
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-lg font-bold text-primary-600">${Number(job.reward).toFixed(2)}</span>
+            <span className="text-lg font-bold text-primary-600">${job.reward}</span>
             <span className={`px-4 py-2 rounded text-sm font-medium transition 
               ${availableVacancy>0 ? "bg-primary-600 hover:bg-primary-700 text-white" : "bg-gray-400 text-white cursor-not-allowed"}`}>
               Apply Now
