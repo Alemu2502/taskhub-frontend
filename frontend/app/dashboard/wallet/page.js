@@ -248,7 +248,7 @@ export default function WalletPage() {
                 )}
                 {withdrawData.method !== 'bep20' && (
                   <div className="text-xs text-yellow-800 bg-yellow-50 px-2 py-1 rounded border border-yellow-200">
-                    <b>Reminder:</b> Name on your Telebirr or CBE account must exactly match your TaskHub account name to prevent payout delays.
+                    <b>Reminder:</b> Name on your Telebirr or CBE account must exactly match your UseTaskHub account name to prevent payout delays.
                   </div>
                 )}
                 <div className="flex gap-3">

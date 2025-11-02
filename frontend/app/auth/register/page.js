@@ -6,7 +6,41 @@ import { useRouter } from 'next/navigation';
 import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { authAPI } from '../../../lib/api';
 import toast from 'react-hot-toast';
-import { FiMail, FiLock, FiUser, FiPhone, FiGlobe, FiShield, FiCalendar, FiCheck, FiX, FiEye, FiEyeOff } from 'react-icons/fi';
+import { 
+  FiMail, FiLock, FiUser, FiPhone, FiGlobe, FiShield, 
+  FiCalendar, FiCheck, FiX, FiEye, FiEyeOff 
+} from 'react-icons/fi';
+
+// COUNTRY PHONE REGEX for strict validation
+const phonePatterns = {
+  Ethiopia: /^\+2519\d{8}$/,
+  Kenya: /^\+2547\d{8}$/,
+  Uganda: /^\+2567\d{8}$/,
+  Tanzania: /^\+2557\d{8}$/,
+  Nigeria: /^\+234[789]\d{9}$/,
+  Ghana: /^\+233(2[0346789]|5[0456789])\d{7}$/,
+  "South Africa": /^\+27[6-8]\d{8}$/,
+  Egypt: /^\+201[0125]\d{8}$/,
+  Morocco: /^\+2126\d{8}$/,
+  Algeria: /^\+213(5|6|7)\d{8}$/,
+  // You can expand this list as required
+};
+const phonePlaceholders = {
+  Ethiopia: "+2519xxxxxxxx",
+  Kenya: "+2547xxxxxxxx",
+  Uganda: "+2567xxxxxxxx",
+  Tanzania: "+2557xxxxxxxx",
+  Nigeria: "+2347xxxxxxxxx/+2348xxxxxxxxx/+2349xxxxxxxxx",
+  Ghana: "+2332xxxxxxxx/+2335xxxxxxxx",
+  "South Africa": "+27[6-8]xxxxxxx",
+  Egypt: "+2011xxxxxxx/+2012xxxxxxx/+2010xxxxxxx/+2015xxxxxxx",
+  Morocco: "+2126xxxxxxx",
+  Algeria: "+2135xxxxxxx/+2136xxxxxxx/+2137xxxxxxx"
+};
+
+function getDefaultCountry() {
+  return "Ethiopia";
+}
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -34,18 +68,25 @@ function RegisterForm() {
   const router = useRouter();
   const { executeRecaptcha } = useGoogleReCaptcha();
 
+  // set Ethiopia as default country
   useEffect(() => {
-  if (typeof window !== "undefined") {
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('ref');
-    if (ref) setFormData(f => ({ ...f, referralCode: ref }));
-  }
-}, []);
+    setFormData(f => ({
+      ...f,
+      country: f.country || getDefaultCountry()
+    }));
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+      if (ref) setFormData(f => ({ ...f, referralCode: ref }));
+    }
+  }, []);
 
   // Check password strength in real-time
   useEffect(() => {
     const password = formData.password;
-    
     if (password) {
       setShowPasswordReqs(true);
       setPasswordStrength({
@@ -90,11 +131,28 @@ function RegisterForm() {
     return true;
   };
 
+  // Enhanced country-by-country phone validation
+  const validatePhone = () => {
+    const country = formData.country || getDefaultCountry();
+    const pattern = phonePatterns[country] || /^\+\d{9,15}$/;
+    if (!pattern.test(formData.mobile)) {
+      const example = phonePlaceholders[country] || "+<countrycode>xxxxxxxx";
+      toast.error(`Enter a valid ${country} mobile (e.g., ${example})`);
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.agreedToTerms) {
       toast.error('You must agree to Terms of Service and Privacy Policy');
+      return;
+    }
+
+    // Phone number validation -- added
+    if (!validatePhone()) {
       return;
     }
 
@@ -124,22 +182,19 @@ function RegisterForm() {
     try {
       // Execute reCAPTCHA
       const recaptchaToken = await executeRecaptcha('register');
-
       const finalCountry = formData.country === 'Other' ? formData.customCountry : formData.country;
 
-     const response = await authAPI.register({
-  fullName: formData.fullName,
-  email: formData.email,
-  password: formData.password,
-  country: finalCountry,
-  mobile: formData.mobile,
-  recaptchaToken,
-  referralCode: formData.referralCode 
-});
+      const response = await authAPI.register({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        country: finalCountry,
+        mobile: formData.mobile,
+        recaptchaToken,
+        referralCode: formData.referralCode 
+      });
 
       toast.success(response.data.message || 'Registration successful! Please check your email to verify your account.');
-      
-      // Redirect to login after 2 seconds
       setTimeout(() => {
         router.push('/auth/login');
       }, 2000);
@@ -149,6 +204,7 @@ function RegisterForm() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
@@ -172,24 +228,22 @@ function RegisterForm() {
               <span>Duplicate accounts are strictly forbidden and will result in permanent ban.</span>
             </p>
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="fullName">Full Name (must match payout account name)</label>
-<input
-  type="text"
-  name="fullName"
-  value={formData.fullName}
-  onChange={handleChange}
-  className="input-field"
-  placeholder="Enter your full legal name"
-  minLength={5}
-  maxLength={40}
-  pattern="[a-zA-Z\s\-'.]+"
-  required
-/>
+              <input
+                type="text"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Enter your full legal name"
+                minLength={5}
+                maxLength={40}
+                pattern="[a-zA-Z\s\-'.]+"
+                required
+              />
             </div>
-
             <div>
               <label className="label">
                 <FiMail className="inline mr-2" />
@@ -205,7 +259,6 @@ function RegisterForm() {
                 required
               />
             </div>
-
             <div>
               <label className="label">
                 <FiGlobe className="inline mr-2" />
@@ -232,7 +285,6 @@ function RegisterForm() {
                 <option value="Other">Other</option>
               </select>
             </div>
-
             {formData.country === 'Other' && (
               <div>
                 <label className="label">
@@ -250,7 +302,6 @@ function RegisterForm() {
                 />
               </div>
             )}
-
             <div>
               <label className="label">
                 <FiPhone className="inline mr-2" />
@@ -262,25 +313,25 @@ function RegisterForm() {
                 value={formData.mobile}
                 onChange={handleChange}
                 className="input-field"
-                placeholder="+251 xxx xxx xxx"
+                // Show correct country placeholder
+                placeholder={phonePlaceholders[formData.country || getDefaultCountry()] || "+xxx..."}
                 required
               />
             </div>
-           <div>
-  <label className="label">
-    Referral Code (optional)
-  </label>
-  <input
-    type="text"
-    name="referralCode"
-    value={formData.referralCode}
-    onChange={handleChange}
-    className="input-field"
-    placeholder="Referral code (if you have one)"
-    disabled={!!formData.referralCode} // auto-filled code can't be edited
-  />
-</div>
-
+            <div>
+              <label className="label">
+                Referral Code (optional)
+              </label>
+              <input
+                type="text"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleChange}
+                className="input-field"
+                placeholder="Referral code (if you have one)"
+                disabled={!!formData.referralCode}
+              />
+            </div>
             <div>
               <label className="label">
                 <FiLock className="inline mr-2" />
@@ -305,7 +356,6 @@ function RegisterForm() {
                   {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
               </div>
-              
               {showPasswordReqs && (
                 <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                   <p className="text-xs font-semibold mb-2 text-gray-700 dark:text-gray-300">
@@ -335,7 +385,6 @@ function RegisterForm() {
                   </div>
                 </div>
               )}
-
               {allPasswordRequirementsMet && !showPasswordReqs && (
                 <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
                   <FiCheck />
@@ -343,7 +392,6 @@ function RegisterForm() {
                 </p>
               )}
             </div>
-
             <div>
               <label className="label">
                 <FiLock className="inline mr-2" />
@@ -380,7 +428,6 @@ function RegisterForm() {
                 </p>
               )}
             </div>
-
             <div className="flex items-start">
               <input
                 id="terms"
@@ -402,7 +449,6 @@ function RegisterForm() {
                 </Link>
               </label>
             </div>
-
             <button
               type="submit"
               disabled={loading || !allPasswordRequirementsMet}
@@ -410,7 +456,6 @@ function RegisterForm() {
             >
               {loading ? 'Creating Account...' : 'Register'}
             </button>
-
             <div className="text-xs text-center text-gray-500 dark:text-gray-400 -mt-2">
               This site is protected by reCAPTCHA and the Google{' '}
               <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary-600 dark:text-primary-400 hover:underline">
@@ -423,7 +468,6 @@ function RegisterForm() {
               apply.
             </div>
           </form>
-
           <div className="mt-6 text-center text-sm">
             <span className="text-gray-600 dark:text-gray-400">Already have an account? </span>
             <Link href="/auth/login" className="text-primary-600 dark:text-primary-400 hover:underline font-medium">
