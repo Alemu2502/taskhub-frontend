@@ -80,7 +80,7 @@ export default function ResetPassword() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="text-4xl font-bold text-primary-600 dark:text-primary-400">
-            TaskHub
+            UseTaskHub
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
             {step === 'request' ? 'Reset Password' : 'Create New Password'}

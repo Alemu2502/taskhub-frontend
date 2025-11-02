@@ -166,7 +166,7 @@ export default function DashboardLayout({ children }) {
                 {sidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
               </button>
               <Link href="/dashboard" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                TaskHub
+                UseTaskHub
               </Link>
               {user.role === 'admin' && (
                 <span className="px-3 py-1 text-xs font-semibold bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-full">

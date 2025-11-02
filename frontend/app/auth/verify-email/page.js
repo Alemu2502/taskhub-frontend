@@ -56,7 +56,7 @@ export default function VerifyEmail() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="text-4xl font-bold text-primary-600 dark:text-primary-400">
-            TaskHub
+            UseTaskHub
           </Link>
         </div>
         <div className="card text-center">

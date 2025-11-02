@@ -41,7 +41,7 @@ export default function Home() {
               <span className="text-primary-600 dark:text-primary-400">to Start Earning</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-              Join TaskHub and turn your online engagement into earnings! Watch YouTube, TikTok, 
+              Join UseTaskHub and turn your online engagement into earnings! Watch YouTube, TikTok, 
               and Facebook videos or follow social media accounts to accumulate rewards. Withdraw easily when you reach $1.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
